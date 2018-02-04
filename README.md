@@ -1,4 +1,5 @@
-# RitsDataApi
+# Nobo
+"Nobo" means "No Borders", also means "登る".
 The api that you could get your data from every service provides by Ritsumeikan Univ.
 
 https://api.rits.fun/
@@ -9,7 +10,7 @@ __注意: 商用利用不可__
 
 # Manaba API
 ## Requirement
-Package ```requests```
+```requests```, ```BeautifulSoup4```
 
 ## How to use
 
@@ -22,4 +23,3 @@ Export as JSON data.
 
 # Syllabus API
 In progress.
-
