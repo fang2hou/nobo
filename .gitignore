@@ -1,0 +1,9 @@
+# Ignore Mac DS_Store files
+.DS_Store
+
+# Ignore test files
+main.py
+test.json
+
+# Ignore compiled files
+__pycache__/*

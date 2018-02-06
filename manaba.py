@@ -1,11 +1,15 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Manaba module of nobo (RitsFun API).
-# env: python3
+# ----------------------------------------
+# Manaba module of Nobo.
+# Fang2hou @ 2/6/2018
+# github: https://github.com/fang2hou/Nobo
+# ----------------------------------------
 import requests
+from bs4 import BeautifulSoup as bs
 import re
 import json
 import fixja
-from bs4 import BeautifulSoup as bs
 
 def splitLessonInfo(rawString):
 	# Confirm no space to avoid regex rule
@@ -74,38 +78,31 @@ class manabaUser(object):
 		forthPage = self.webSession.post(forthPagePath, forthPagePostData)
 
 	def getCourseList(self):
-		# get fake data
-		# with open("temp.html", encoding='utf-8', mode='r') as tempFile:
-		#	coursePageCourseTable = bs(tempFile.read(), "html.parser")
-		#	tempFile.close()
-
 		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course")
 		coursePageCourseTable = bs(coursePage.text, "html.parser").select(".courselist")[0]
 
-		# initialize the output list
+		# Initialize the output list
 		self.courseList = []
 
-		debugs = True
-
-		# try to get each lesson information
-		# the first -> 0, last 2 -> -2 is not a lesson (department notice, research etc.)
+		# Try to get each lesson information
+		# The first -> 0, last 2 -> -2 is not a lesson (department notice, research etc.)
 		for row in coursePageCourseTable.select(".courselist-c")[1:-2]:
 			tempCourseInfo = {}
 
 			lessonNameTag = row.find("td")
 			
-			# convert the name into correct encode
+			# Convert the name into correct encode
 			lessonName = lessonNameTag.select(".courselist-title")[0].get_text()
 			lessonName = fixja.convertHalfwidth(lessonName)
 			lessonName = fixja.removeNewLine(lessonName)
 
-			# if the lesson has two names and codes, set the flag to process automatically
+			# If the lesson has two names and codes, set the flag to process automatically
 			if "§" in lessonName:
 				hasTwoNames = True
 			else:
 				hasTwoNames = False
 
-			# split the code, name, and class information
+			# Split the code, name, and class information
 			if hasTwoNames:
 				lessonNames = lessonName.split("§")
 				lessonCodes = {}
@@ -115,7 +112,7 @@ class manabaUser(object):
 			else:
 				lessonCode, lessonName, lessonClass = splitLessonInfo(lessonName)
 
-			# update the basic node of tempCourseInfo
+			# Update the basic node of tempCourseInfo
 			if hasTwoNames:
 				tempCourseInfo["basic"] = {}
 				tempCourseInfo["basic"] = [{
@@ -135,16 +132,16 @@ class manabaUser(object):
 					"class": lessonClass
 				}]
 
-			# get the next node that contains the lesson year information
+			# Get the next node that contains the lesson year information
 			lessonYearTag = lessonNameTag.find_next_sibling("td")
 			lessonYear    = int(lessonYearTag.get_text())
 			
 
-			# get the next node that contains lesson time and classroom information
+			# Get the next node that contains lesson time and classroom information
 			lessonTimeRoomTag = lessonYearTag.find_next_sibling("td")
 			lessonTimeString  = lessonTimeRoomTag.find("span").get_text()
 			
-			# get the semester:
+			# Get the semester information
 			if "春" in lessonTimeString:
 				lessonSemester = "spring"
 			elif "秋" in lessonTimeString:
@@ -152,7 +149,7 @@ class manabaUser(object):
 			else:
 				lessonSemester = "unknown"
 
-			# get the weekday and period
+			# Get the weekday and period information
 			try:
 				lessonWeekday, lessonPeriod = re.findall("(月|火|水|木|金)([0-9]-[0-9]|[0-9])", lessonTimeString)[0]
 				lessonWeekday = fixja.convertWeekday(lessonWeekday)
@@ -160,25 +157,25 @@ class manabaUser(object):
 				lessonWeekday, lessonPeriod = "unknown", "unknown"
 
 			try:
-				# delete useless tags
+				# Delete useless tags
 				lessonTimeRoomTag.span.extract()
 				lessonTimeRoomTag.br.extract()
 			except:
 				raise
 			
 			try:
-				# split the campus and room information
+				# Split the campus and room information
 				lessonCampus, lessonRoom = re.findall("(衣笠|BKC|OIC) (.*)", lessonTimeRoomTag.get_text())[0]
-				# fix if "kic" written in Kanji.
+				# Fix if "KIC" written in Kanji.
 				lessonCampus = lessonCampus.replace("衣笠", "KIC")
 			except:
 				lessonCampus, lessonRoom = "unknown", "unknown"
 			
-			# get teacher information
+			# Get teacher information
 			lessonTeacherTag = lessonTimeRoomTag.find_next_sibling("td")
 			lessonTeacherString = lessonTeacherTag.get_text()
 
-			# confirm the teacher number
+			# Confirm if there are several teachers in list
 			if "、" in lessonTeacherString:
 				hasServeralTeachers = True
 			else:
@@ -189,8 +186,7 @@ class manabaUser(object):
 			else:
 				lessonTeacher = [lessonTeacherString]
 			
-			# update information
-
+			# Update information on temporary course information dictionary
 			if hasServeralTeachers:
 				tempCourseInfo["teacher"] = lessonTeachers
 			else:
@@ -205,15 +201,15 @@ class manabaUser(object):
 			tempCourseInfo["campus"] = lessonCampus
 			tempCourseInfo["room"] = lessonRoom
 			
-			# append the information of this course into output list
+			# Append the information of this course into output list
 			self.courseList.append(tempCourseInfo)
-
-	def loadCoursePage(self):
-		print(self.webSession.get("https://ct.ritsumei.ac.jp/ct/course_1436639_news_1785319").text)
 
 	def outputJSON(self, outputPath):
 		if len(self.courseList) > 0:
+			# Output data if the user has got information of all courses
 			with open(outputPath, 'w+', encoding='utf8') as outfile:
+				# Fix Kanji issue, set indent as 4
 				json.dump(self.courseList, outfile, ensure_ascii=False, indent=4)
 		else:
+			# Notify when output without information of courses
 			print("Use the getCourseList() method to get data first.")

@@ -1,7 +1,7 @@
 # Nobo
 "Nobo" means "No Borders", also means "登る" in Japanese.
 
-This the first API that you could get your data from every service provides by Ritsumeikan Univ.
+This the first API that you could get your data from each service provides by Ritsumeikan Univ.
 
 # License
 __GPLv3__
@@ -22,8 +22,8 @@ __注意: 商用利用不可__
 2. Create an manabaUser object.
 
     ```python
-    # The username and password is not real :)
-    # Please initialized with an real account.
+    # The following username and password is not real :)
+    # Please initialize with an real account.
     fangzhou = manabaUser(username="is0000ab", password="12345678")
     ```
 
