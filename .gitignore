@@ -3,7 +3,7 @@
 
 # Ignore test files
 main.py
-test.json
+temp.*
 
 # Ignore compiled files
 __pycache__/*

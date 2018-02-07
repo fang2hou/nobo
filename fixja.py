@@ -49,3 +49,18 @@ def convertWeekday(inputString):
 		finalString = finalString.replace(jaweek, enweek)
 
 	return finalString
+
+def removeLast(inputString):
+	finalString = inputString
+
+	removeList = [
+		"\xa0",
+		"\n",
+		"\t",
+		" "
+	]
+
+	while (finalString[-1:] in removeList):
+	 	finalString = finalString[:-1]
+
+	return finalString
