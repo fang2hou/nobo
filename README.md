@@ -1,7 +1,11 @@
 # Nobo
 "Nobo" means "No Borders", also means "登る" in Japanese.
 
-This the first API that you could get your data from each service provides by Ritsumeikan Univ.
+This is a data export that you could get your data from each service provides by Ritsumeikan Univ.
+
+You can use **Nobo** to build your API with python frameworks(`Flask`, `Django` etc.).
+
+**Nobo** now is served as back-end of RitsFun App(not released).
 
 # License
 __GPLv3__
@@ -19,7 +23,7 @@ __注意: 商用利用不可__
     from manaba import *
     ```
 
-2. Create an manabaUser object.
+2. Create a `manabaUser` instance.
 
     ```python
     # The following username and password is not real :)
@@ -89,7 +93,7 @@ The example course will show as following.
     from syllabus import *
     ```
 
-2. Create an manabaUser object.
+2. Create a `syllabusUser` instance.
 
     ```python
     # The following username and password is not real :)
