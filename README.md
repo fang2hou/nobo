@@ -10,11 +10,28 @@ You can use **Nobo** to build your API with python frameworks(`Flask`, `Django` 
 # License
 __GPLv3__
 
-__注意: 商用利用不可__
+__注意: 商用利用の際にはご連絡願います。__
+# TODO
+* [ ] Reform with go-lang.
+* [ ] Fix manaba+R semesterInfo.
+* [ ] Get RefBook [Syllabus]
+* [ ] Get TextBook [Syllabus]
+* [ ] Get RefPage [Syllabus]
+* [ ] Get BasicInfo [Syllabus]
+* [ ] Flask Example
+* [ ] Final Examination data export [Campus Web API]
 
 # Manaba API
 ## Requirement
-`requests` , `BeautifulSoup4`, `re`, `json`
+```python
+"Environment": "Python 3.4+"
+"Package List":[
+    "requests",
+    "BeautifulSoup4",
+    "re",
+    "json"
+]
+```
 
 ## How to use
 1. Import the manaba class.
@@ -84,8 +101,15 @@ The example course will show as following.
 
 # Syllabus API
 ## Requirement
-`requests` , `BeautifulSoup4`, `re`, `json`
-
+```python
+"Environment": "Python 3.4+"
+"Package List":[
+    "requests",
+    "BeautifulSoup4",
+    "re",
+    "json"
+]
+```
 ## How to use
 1. Import the manaba class.
 
