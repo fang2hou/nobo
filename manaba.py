@@ -145,7 +145,7 @@ class manabaUser(object):
 			if "春" in lessonTimeString:
 				lessonSemester = "spring"
 			elif "秋" in lessonTimeString:
-				lessonSemester = "autumn"
+				lessonSemester = "fall"
 			else:
 				lessonSemester = "unknown"
 

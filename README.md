@@ -13,7 +13,7 @@ __GPLv3__
 __注意: 商用利用の際にはご連絡願います。__
 # TODO
 * [ ] Reform with go-lang.
-* [ ] Fix manaba+R semesterInfo.
+* [x] Fix manaba+R semesterInfo.
 * [ ] Get RefBook [Syllabus]
 * [ ] Get TextBook [Syllabus]
 * [ ] Get RefPage [Syllabus]
@@ -111,7 +111,7 @@ The example course will show as following.
 ]
 ```
 ## How to use
-1. Import the manaba class.
+1. Import the syllabus class.
 
     ```python
     from syllabus import *
@@ -125,7 +125,7 @@ The example course will show as following.
     fangzhou = syllabusUser(username="is0000ab", password="12345678")
     ```
 
-3. Use `login()` method to log in Manaba+R.
+3. Use `login()` method to log in Syllabus.
 
     ```python
     fangzhou.login()
