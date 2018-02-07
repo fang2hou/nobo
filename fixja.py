@@ -60,7 +60,10 @@ def removeLast(inputString):
 		" "
 	]
 
-	while (finalString[-1:] in removeList):
-	 	finalString = finalString[:-1]
+	if (finalString in removeList):
+		finalString = ""
+	else:
+		while (finalString[-1:] in removeList):
+		 	finalString = finalString[:-1]
 
 	return finalString

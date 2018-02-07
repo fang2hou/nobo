@@ -77,9 +77,87 @@ class syllabusUser(object):
 		syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
 		syllabusPageHeadTag = bs(syllabusPage.text, "html.parser")
 
+		# FOR DEBUG
+		# ---------------------------------
+		# # get file and save -------------
+		# syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
+		# with open("temp.html", "w+") as f:
+		# 	f.write(syllabusPage.text)
+		# return 
+
+		# # fake data ---------------------
+		# with open("temp.html", "r") as inputFile:
+		# 	syllabusPageHeadTag = bs(inputFile.read(), "html.parser")
+
+		# Start of processing
+		# Basic
+		basicInfoTag = syllabusPageHeadTag.select(".jugyo_table")[0].find("tr").find_next_sibling("tr").find("td")
+		courseNameString = fixja.removeLast(basicInfoTag.get_text().strip("\t\n "))
+		courseNameString = fixja.convertHalfwidth(courseNameString)
+		basicInfo = []
+
+		if "  " in courseNameString:
+			hasSeveralNames = True
+		else:
+			hasSeveralNames = False
+		
+		if hasSeveralNames:
+			courseNames = courseNameString.split("  ")
+		else:
+			courseName = courseNameString
+
+		if hasSeveralNames:
+			for courseName in courseNames:
+				courseClass = re.findall("\([A-Za-z][0-9]\)", courseName)[0].strip("()")
+				courseName = courseName.split(" (")[0]
+				basicInfo.append({
+					"name": courseName,
+					"class": courseClass
+				})
+
+		# Semester
+		semesterTag = basicInfoTag.find_next_sibling("td")
+		semesterString = semesterTag.get_text()
+		if "前期" in semesterString:
+			courseSemester = "spring"
+		elif "後期" in semesterString:
+			courseSemester = "fall"
+		else:
+			courseSemester = "unknown"
+
+		# Course Time
+		courseTimeTag = semesterTag.find_next_sibling("td")
+		courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
+		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall("(月|火|水|木|金)([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
+		courseWeekday = fixja.convertWeekday(courseWeekday)
+		courseSciPeriod = courseSciPeriod.strip("()")
+		courseTime = {
+			"year": courseYear,
+			"semester": courseSemester,
+			"weekday": courseWeekday,
+			"period_art": courseArtPeriod,
+			"period_sci": courseSciPeriod,
+		}
+		
 		# Credit
-		creditTag = syllabusPageHeadTag.select(".jugyo_table")[0].find("tr").find_next_sibling("tr").find_all("td")[3]
+		creditTag = courseTimeTag.find_next_sibling("td")
 		credit = int(creditTag.get_text())
+
+		# Teacher
+		courseTeacherTag = creditTag.find_next_sibling("td")
+		courseTeacherString = courseTeacherTag.get_text()
+		courseTeacherString = fixja.removeLast(courseTeacherString.replace("\t", "").replace("\n", "").strip(" "))
+
+		# Confirm if there are several teachers in list
+		if "、" in courseTeacherString:
+			hasServeralTeachers = True
+		else:
+			hasServeralTeachers = False
+
+		if hasServeralTeachers:
+			courseTeacher = courseTeacherString.split("、")
+		else:
+			courseTeacher = [courseTeacherString]
 
 		# Course Outline and Method
 		outlineTag = syllabusPageHeadTag.find("dl")
@@ -158,24 +236,76 @@ class syllabusUser(object):
 		advice = fixja.removeLast(adviceTag.find("dd").get_text())
 
 		# Textbooks
-		# TODO
 		textBookTag = adviceTag.find_next_sibling("dl")
-		textBook = fixja.removeLast(textBookTag.find("dd").get_text())
-			# Note
-		 
+		textBooks = {
+			"note": "",
+			"book": []
+		}
+
+		textBooksTable = textBookTag.find("table")
+		if textBooksTable != None:
+			for row in textBooksTable.find_all("tr")[1:]:
+				tempTextBook = {}
+				tempTag = row
+				tempTag = tempTag.find("td")
+				tempTextBook["title"] = fixja.removeLast(tempTag.get_text()).replace("\n", "")
+				tempTag = tempTag.find_next_sibling("td")
+				tempTextBook["author"] = fixja.removeLast(tempTag.get_text())
+				tempTag = tempTag.find_next_sibling("td")
+				tempTextBook["publisher"] = fixja.removeLast(tempTag.get_text())
+				tempTag = tempTag.find_next_sibling("td")
+				tempTextBook["ISBN"] = fixja.removeLast(tempTag.get_text()).replace("ISBN","")
+				tempTag = tempTag.find_next_sibling("td")
+				tempTextBook["comment"] = fixja.removeLast(tempTag.get_text())
+				textBooks["book"].append(tempTextBook)
+		textBooks["note"] = fixja.removeLast(textBookTag.find_all("dd", class_="nest")[0].get_text())
+
 		# Reference Books
-		# TODO
 		refBookTag = textBookTag.find_next_sibling("dl")
-			# Note
+		refBooks = {
+			"note": "",
+			"book": []
+		}
 
-
-		# Web Pages for Reference
-		# TODO
-		refPagekTag = refBookTag.find_next_sibling("dl")
-		refPage = fixja.removeLast(refPagekTag.find("dd").get_text())
+		refBooksTable = refBookTag.find("table")
+		if textBooksTable != None:
+			for row in refBooksTable.find_all("tr")[1:]:
+				tempRefBook = {}
+				tempTag = row
+				tempTag = tempTag.find("td")
+				tempRefBook["title"] = fixja.removeLast(tempTag.get_text()).replace("\n", "")
+				tempTag = tempTag.find_next_sibling("td")
+				tempRefBook["author"] = fixja.removeLast(tempTag.get_text())
+				tempTag = tempTag.find_next_sibling("td")
+				tempRefBook["publisher"] = fixja.removeLast(tempTag.get_text())
+				tempTag = tempTag.find_next_sibling("td")
+				tempRefBook["ISBN"] = fixja.removeLast(tempTag.get_text()).replace("ISBN","")
+				tempTag = tempTag.find_next_sibling("td")
+				tempRefBook["comment"] = fixja.removeLast(tempTag.get_text())
+				refBooks["book"].append(tempRefBook)
+		refBooks["note"] = fixja.removeLast(refBookTag.find_all("dd", class_="nest")[0].get_text())
 		
+		# Web Pages for Reference
+		refPageTag = refBookTag.find_next_sibling("dl")
+		refPageStrings = refPageTag.find("dd").contents
+		refPage = ""
+
+		for refPageString in refPageStrings:
+			afterString = fixja.removeLast(str(refPageString))
+			if afterString != "":
+				if "<a" in afterString:
+					refPage += re.findall(">(.+)<", afterString)[0]
+					refPage += " "
+				elif afterString == "<br/>":
+					refPage = refPage[:-1] + "\n"
+				else:
+					refPage += afterString
+					refPage += " "
+
+		refPage = fixja.removeLast(refPage)
+
 		# How to Communicate with the Instructor In and Out of Class(Including Instructor Contact Information)
-		contactTag = refPagekTag.find_next_sibling("dl")
+		contactTag = refPageTag.find_next_sibling("dl")
 		contactString = contactTag.find("dd")
 		contactMethods = []
 
@@ -188,6 +318,9 @@ class syllabusUser(object):
 
 		# Save as dictionary
 		self.syllabusList = {
+			"basic": basicInfo,
+			"time": courseTime,
+			"teacher": courseTeacher,
 			"credit": credit,
 			"outline": outline,
 			"objectives": objectives,
@@ -196,6 +329,9 @@ class syllabusUser(object):
 			"recommendation": recommendation,
 			"grade_evluation": gradeEvaluation,
 			"advice": advice,
+			"text_books": textBooks,
+			"ref_books": refBooks,
+			"ref_pages": refPage,
 			"contact_methods": contactMethods,
 			"other_comments": otherComments,
 		}
