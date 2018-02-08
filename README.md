@@ -22,14 +22,14 @@ __注意: 商用利用の際にはご連絡願います。__
 * [x] Get Teacher Information [Syllabus API]
 * [x] Get RefPage [Syllabus API]
 * [x] Get BasicInfo [Syllabus API]
-* [ ] Flask Example
+* [x] Flask Example
 * [ ] Final Examination data export [Campus Web API]
 
 # Start with pip
 For Linux / Windows
 
 ```bash
-python3 -m pip install -r requirements.txt
+python36 -m pip install -r requirements.txt
 ```
 
 For macOS with Homebrew
@@ -67,7 +67,7 @@ curl https://bootstrap.pypa.io/get-pip.py | python3
 
     ```python
     # The following username and password is not real :)
-    # Please initialize with an real account.
+    # Please initialize with a real account.
     fangzhou = manabaUser(username="is0000ab", password="12345678")
     ```
 
@@ -144,7 +144,8 @@ The example course will show as following.
 
     ```python
     # The following username and password is not real :)
-    # Please initialize with an real account.
+    # Please initialize with a
+     real account.
     fangzhou = syllabusUser(username="is0000ab", password="12345678")
     ```
 

@@ -243,7 +243,7 @@ class syllabusUser(object):
 		}
 
 		textBooksTable = textBookTag.find("table")
-		if textBooksTable != None:
+		if textBooksTable:
 			for row in textBooksTable.find_all("tr")[1:]:
 				tempTextBook = {}
 				tempTag = row
@@ -268,7 +268,7 @@ class syllabusUser(object):
 		}
 
 		refBooksTable = refBookTag.find("table")
-		if textBooksTable != None:
+		if refBooksTable:
 			for row in refBooksTable.find_all("tr")[1:]:
 				tempRefBook = {}
 				tempTag = row
