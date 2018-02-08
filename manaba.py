@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 import re
 import json
-import fixja
+from . import fixja
 
 def splitLessonInfo(rawString):
 	# Confirm no space to avoid regex rule
