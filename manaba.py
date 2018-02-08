@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 import re
 import json
-from . import fixja
+import fixja
 
 def splitLessonInfo(rawString):
 	# Confirm no space to avoid regex rule
@@ -78,7 +78,8 @@ class manabaUser(object):
 		forthPage = self.webSession.post(forthPagePath, forthPagePostData)
 
 	def getCourseList(self):
-		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course")
+		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
+
 		coursePageCourseTable = bs(coursePage.text, "html.parser").select(".courselist")[0]
 
 		# Initialize the output list

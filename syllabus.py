@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup as bs
 from bs4 import UnicodeDammit as ud
 import re
 import json
-from . import fixja
+import fixja
 
 class syllabusUser(object):
 	"""syllabus Class"""
