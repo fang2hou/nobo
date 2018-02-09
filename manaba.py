@@ -6,10 +6,10 @@
 # github: https://github.com/fang2hou/Nobo
 # ----------------------------------------
 import requests
-from bs4 import BeautifulSoup as bs
 import re
 import json
-import fixja
+from bs4 import BeautifulSoup as bs
+from .lib import *
 
 def splitLessonInfo(rawString):
 	# Confirm no space to avoid regex rule
@@ -118,18 +118,18 @@ class manabaUser(object):
 				tempCourseInfo["basic"] = {}
 				tempCourseInfo["basic"] = [{
 					"name": lessonNames[0],
-					"code": lessonCodes[0],
+					"code": int(lessonCodes[0]),
 					"class": lessonClasses[0]
 				},{
 					"name": lessonNames[1],
-					"code": lessonCodes[1],
+					"code": int(lessonCodes[1]),
 					"class": lessonClasses[1]
 				}]
 			else:
 				tempCourseInfo["two_names"] = "false";
 				tempCourseInfo["basic"]  = [{
 					"name": lessonName,
-					"code": lessonCode,
+					"code": int(lessonCode),
 					"class": lessonClass
 				}]
 

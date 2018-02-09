@@ -1,92 +1,55 @@
 # Nobo
 "Nobo" means "No Borders", also means "登る" in Japanese.
 
-This is a data export that you could get your data from each service provides by Ritsumeikan Univ.
+**Nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
 
-You can use **Nobo** to build your API with python frameworks(`Flask`, `Django` etc.).
+You can use **Nobo** to build your API with many frameworks (`Flask`, `Django` etc.) under GPLv3 License.
 
-**Nobo** now is served as back-end of RitsFun App(not released).
+**Nobo** is the most important part of [RitsFun back-end API](https://api.rits.fun).
 
 # License
 __GPLv3__
 
 __注意: 商用利用の際にはご連絡願います。__
 
-# TODO
-* [ ] Reform with go-lang.
-* [x] Fix manaba+R semesterInfo.
-* [ ] Get PeroidInfo for science student. [Manaba API]
-* [ ] Rename some variables started with "lesson".[Manaba API]
-* [x] Get RefBook [Syllabus API]
-* [x] Get TextBook [Syllabus API]
-* [x] Get Teacher Information [Syllabus API]
-* [x] Get RefPage [Syllabus API]
-* [x] Get BasicInfo [Syllabus API]
-* [x] Flask Example
-* [ ] Final Examination data export [Campus Web API]
-
-# Start with pip
-For Linux / Windows
+# How to use?
+Install requirements with pip.
 
 ```bash
-python36 -m pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-For macOS with Homebrew
+Use **Nobo** in your project (.py).
 
-```bash
-pip3 install -r requirements.txt
-```
-
-If you cannot install with pip, pleas try to use the following command to install.
-
-```bash
-curl https://bootstrap.pypa.io/get-pip.py | python3
+```python
+import Nobo
 ```
 
 # Manaba API
-## Requirement
-```python
-"Environment": "Python 3.4+"
-"Package List":[
-    "requests",
-    "BeautifulSoup4",
-    "re",
-    "json"
-]
-```
-
 ## How to use
-1. Import the manaba class.
-
-    ```python
-    from manaba import *
-    ```
-
-2. Create a `manabaUser` instance.
+1. Create a `manabaUser` instance.
 
     ```python
     # The following username and password is not real :)
-    # Please initialize with a real account.
-    fangzhou = manabaUser(username="is0000ab", password="12345678")
+    fangzhou = Nobo.manabaUser("is0000ab", "12345678")
     ```
 
-3. Use `login()` method to log in Manaba+R.
+2. Use `login()` method to log in Manaba+R.
 
     ```python
     fangzhou.login()
     ```
 
-4. Use `getCourseList()` method to get all courses information.
+3. Use `getCourseList()` method to get all courses information.
 
     ```python
     fangzhou.getCourseList()
     ```
     
-5. Use `outputJSON("<ouputFileName>")` method to save data as JSON format.
+4. Use `outputJSON("<ouputFileName>")` method to save data as JSON format.
 
     ```python
-    fangzhou.outputJSON("test.json")
+    fangzhou.outputJSON("temp.json")
     ```
 
 ## Example manaba data
@@ -98,7 +61,7 @@ The example course will show as following.
         "basic": [
             {
                 "name": "(留)日本語Ⅷ(キャリア日本語b)",
-                "code": "30819",
+                "code": 30819,
                 "class": "G1"
             },
             {
@@ -119,52 +82,41 @@ The example course will show as following.
         "campus": "BKC",
         "room": "アドセミナリオ309号教室"
     },
+   
+    {
+        ...
+        other courses
+        ...
+    }
 ]
 ```
 
 # Syllabus API
-## Requirement
-```python
-"Environment": "Python 3.4+"
-"Package List":[
-    "requests",
-    "BeautifulSoup4",
-    "re",
-    "json"
-]
-```
 ## How to use
-1. Import the syllabus class.
-
-    ```python
-    from syllabus import *
-    ```
-
-2. Create a `syllabusUser` instance.
+1. Create a `syllabusUser` instance.
 
     ```python
     # The following username and password is not real :)
-    # Please initialize with a
-     real account.
-    fangzhou = syllabusUser(username="is0000ab", password="12345678")
+    fangzhou = Nobo.syllabusUser("is0000ab", "12345678")
     ```
 
-3. Use `login()` method to log in Syllabus.
+2. Use `login()` method to log in Syllabus.
 
     ```python
     fangzhou.login()
     ```
 
-4. Use `getSyllabusById(<courseYear>, <courseID>)` method to get all courses information.
+3. Use `getSyllabusById(<courseYear>, <courseID>)` method to get all courses information.
 
     ```python
     fangzhou.getSyllabusById(2017, 33294)
     ```
     
-5. Use `outputJSON("<ouputFileName>")` method to save data as JSON format.
+4. Use `outputJSON("<ouputFileName>")` method to save data as JSON format.
 
     ```python
-    fangzhou.outputJSON("test.json")
+    fangzhou.outputJSON("temp.json")
+    ```
     
 ## Example syllabus data
 The example course will show as following.
@@ -310,5 +262,4 @@ The example course will show as following.
     "other_comments": ""
 }
 ```
-
 

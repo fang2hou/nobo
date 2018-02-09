@@ -6,4 +6,4 @@ main.py
 temp.*
 
 # Ignore compiled files
-__pycache__/*
+*/__pycache__/*

@@ -3,12 +3,12 @@
         "basic": [
             {
                 "name": "(留)日本語Ⅷ(キャリア日本語b)",
-                "code": "30819",
+                "code": 30819,
                 "class": "G1"
             },
             {
                 "name": "(留)日本語ⅩⅡ 口頭表現",
-                "code": "30993",
+                "code": 30993,
                 "class": "G1"
             }
         ],
@@ -28,12 +28,12 @@
         "basic": [
             {
                 "name": "知能情報処理演習2",
-                "code": "33321",
+                "code": 33321,
                 "class": "D3"
             },
             {
                 "name": "知能情報システム創成2",
-                "code": "33510",
+                "code": 33510,
                 "class": "D3"
             }
         ],
@@ -43,7 +43,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Monday",
             "period": "3"
         },
@@ -55,7 +55,7 @@
         "basic": [
             {
                 "name": "数学2",
-                "code": "33193",
+                "code": 33193,
                 "class": "K1"
             }
         ],
@@ -64,7 +64,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Monday",
             "period": "4"
         },
@@ -76,7 +76,7 @@
         "basic": [
             {
                 "name": "人工知能概論",
-                "code": "33235",
+                "code": 33235,
                 "class": "D1"
             }
         ],
@@ -85,7 +85,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Tuesday",
             "period": "3"
         },
@@ -97,7 +97,7 @@
         "basic": [
             {
                 "name": "数学演習2",
-                "code": "33217",
+                "code": 33217,
                 "class": "R5"
             }
         ],
@@ -106,7 +106,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Tuesday",
             "period": "5"
         },
@@ -118,7 +118,7 @@
         "basic": [
             {
                 "name": "ロボット工学基礎論",
-                "code": "33308",
+                "code": 33308,
                 "class": "D1"
             }
         ],
@@ -128,7 +128,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Wednesday",
             "period": "1"
         },
@@ -140,7 +140,7 @@
         "basic": [
             {
                 "name": "電気電子回路",
-                "code": "33264",
+                "code": 33264,
                 "class": "QA"
             }
         ],
@@ -149,7 +149,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Wednesday",
             "period": "2"
         },
@@ -161,7 +161,7 @@
         "basic": [
             {
                 "name": "知能情報学実験Ⅰ",
-                "code": "33294",
+                "code": 33294,
                 "class": "D1"
             }
         ],
@@ -172,7 +172,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Wednesday",
             "period": "3-4"
         },
@@ -184,7 +184,7 @@
         "basic": [
             {
                 "name": "数学4",
-                "code": "33200",
+                "code": 33200,
                 "class": "K1"
             }
         ],
@@ -193,7 +193,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Wednesday",
             "period": "5"
         },
@@ -204,12 +204,12 @@
         "basic": [
             {
                 "name": "情報基礎数学",
-                "code": "33254",
+                "code": 33254,
                 "class": "K2"
             },
             {
                 "name": "情報基礎数学",
-                "code": "33504",
+                "code": 33504,
                 "class": "BI"
             }
         ],
@@ -218,7 +218,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Thursday",
             "period": "1"
         },
@@ -230,7 +230,7 @@
         "basic": [
             {
                 "name": "自然言語処理",
-                "code": "33259",
+                "code": 33259,
                 "class": "K1"
             }
         ],
@@ -239,7 +239,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Thursday",
             "period": "2"
         },
@@ -251,7 +251,7 @@
         "basic": [
             {
                 "name": "データベース",
-                "code": "33240",
+                "code": 33240,
                 "class": "D1"
             }
         ],
@@ -260,7 +260,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Thursday",
             "period": "5"
         },
@@ -272,7 +272,7 @@
         "basic": [
             {
                 "name": "情報理論D",
-                "code": "33281",
+                "code": 33281,
                 "class": "D1"
             }
         ],
@@ -281,7 +281,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Friday",
             "period": "3"
         },
@@ -293,7 +293,7 @@
         "basic": [
             {
                 "name": "Information Science2",
-                "code": "33288",
+                "code": 33288,
                 "class": "D1"
             }
         ],
@@ -302,7 +302,7 @@
         ],
         "time": {
             "year": 2017,
-            "semester": "autumn",
+            "semester": "fall",
             "weekday": "Friday",
             "period": "4"
         },
