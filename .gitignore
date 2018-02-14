@@ -7,3 +7,7 @@ temp.*
 
 # Ignore compiled files
 */__pycache__/*
+
+# Ignore other files
+/.idea/*
+/venv/*

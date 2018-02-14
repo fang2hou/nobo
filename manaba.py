@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------
-# Manaba module of Nobo.
+# Manaba module of Nobo
 # Fang2hou @ 2/6/2018
 # github: https://github.com/fang2hou/Nobo
 # ----------------------------------------
@@ -75,7 +75,7 @@ class manabaUser(object):
 		forthPagePath = bs(thirdPage.text, "html.parser").find('form').attrs["action"].replace("&#x3a;",":").replace("&#x2f;","/")
 
 		# Load forth page
-		forthPage = self.webSession.post(forthPagePath, forthPagePostData)
+		self.webSession.post(forthPagePath, forthPagePostData)
 
 	def getCourseList(self):
 		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
@@ -93,119 +93,107 @@ class manabaUser(object):
 			lessonNameTag = row.find("td")
 			
 			# Convert the name into correct encode
-			lessonName = lessonNameTag.select(".courselist-title")[0].get_text()
-			lessonName = fixja.convertHalfwidth(lessonName)
-			lessonName = fixja.removeNewLine(lessonName)
+			courseName = lessonNameTag.select(".courselist-title")[0].get_text()
+			courseName = fixja.convertHalfwidth(courseName)
+			courseName = fixja.removeNewLine(courseName)
 
 			# If the lesson has two names and codes, set the flag to process automatically
-			if "§" in lessonName:
+			if "§" in courseName:
 				hasTwoNames = True
 			else:
 				hasTwoNames = False
 
 			# Split the code, name, and class information
 			if hasTwoNames:
-				lessonNames = lessonName.split("§")
-				lessonCodes = {}
-				lessonClasses = {}
-				lessonCodes[0], lessonNames[0], lessonClasses[0] = splitLessonInfo(lessonNames[0])
-				lessonCodes[1], lessonNames[1], lessonClasses[1] = splitLessonInfo(lessonNames[1])
-			else:
-				lessonCode, lessonName, lessonClass = splitLessonInfo(lessonName)
-
-			# Update the basic node of tempCourseInfo
-			if hasTwoNames:
+				courseNames = courseName.split("§")
+				courseCodes = {}
+				courseClasses = {}
+				courseCodes[0], courseNames[0], courseClasses[0] = splitLessonInfo(courseNames[0])
+				courseCodes[1], courseNames[1], courseClasses[1] = splitLessonInfo(courseNames[1])
 				tempCourseInfo["basic"] = {}
 				tempCourseInfo["basic"] = [{
-					"name": lessonNames[0],
-					"code": int(lessonCodes[0]),
-					"class": lessonClasses[0]
-				},{
-					"name": lessonNames[1],
-					"code": int(lessonCodes[1]),
-					"class": lessonClasses[1]
+					"name": courseNames[0],
+					"code": int(courseCodes[0]),
+					"class": courseClasses[0]
+				}, {
+					"name": courseNames[1],
+					"code": int(courseCodes[1]),
+					"class": courseClasses[1]
 				}]
 			else:
-				tempCourseInfo["two_names"] = "false";
-				tempCourseInfo["basic"]  = [{
-					"name": lessonName,
-					"code": int(lessonCode),
-					"class": lessonClass
+				courseCode, courseName, courseClass = splitLessonInfo(courseName)
+				tempCourseInfo["two_names"] = "false"
+				tempCourseInfo["basic"] = [{
+					"name": courseName,
+					"code": int(courseCode),
+					"class": courseClass
 				}]
 
+
 			# Get the next node that contains the lesson year information
-			lessonYearTag = lessonNameTag.find_next_sibling("td")
-			lessonYear    = int(lessonYearTag.get_text())
+			courseYearTag = lessonNameTag.find_next_sibling("td")
+			courseYear    = int(courseYearTag.get_text())
 			
 
 			# Get the next node that contains lesson time and classroom information
-			lessonTimeRoomTag = lessonYearTag.find_next_sibling("td")
-			lessonTimeString  = lessonTimeRoomTag.find("span").get_text()
+			courseTimeRoomTag = courseYearTag.find_next_sibling("td")
+			courseTimeString  = courseTimeRoomTag.find("span").get_text()
 			
 			# Get the semester information
-			if "春" in lessonTimeString:
-				lessonSemester = "spring"
-			elif "秋" in lessonTimeString:
-				lessonSemester = "fall"
+			if "春" in courseTimeString:
+				courseSemester = "spring"
+			elif "秋" in courseTimeString:
+				courseSemester = "fall"
 			else:
-				lessonSemester = "unknown"
+				courseSemester = "unknown"
 
 			# Get the weekday and period information
 			try:
-				lessonWeekday, lessonPeriod = re.findall("(月|火|水|木|金)([0-9]-[0-9]|[0-9])", lessonTimeString)[0]
-				lessonWeekday = fixja.convertWeekday(lessonWeekday)
+				courseWeekday, coursePeriod = re.findall("([月|火|水|木|金])([0-9]-[0-9]|[0-9])", courseTimeString)[0]
+				courseWeekday = fixja.convertWeekday(courseWeekday)
 			except:
-				lessonWeekday, lessonPeriod = "unknown", "unknown"
+				courseWeekday, coursePeriod = "unknown", "unknown"
 
 			try:
 				# Delete useless tags
-				lessonTimeRoomTag.span.extract()
-				lessonTimeRoomTag.br.extract()
+				courseTimeRoomTag.span.extract()
+				courseTimeRoomTag.br.extract()
 			except:
 				raise
 			
 			try:
 				# Split the campus and room information
-				lessonCampus, lessonRoom = re.findall("(衣笠|BKC|OIC) (.*)", lessonTimeRoomTag.get_text())[0]
+				courseCampus, courseRoom = re.findall("(衣笠|BKC|OIC) (.*)", courseTimeRoomTag.get_text())[0]
 				# Fix if "KIC" written in Kanji.
-				lessonCampus = lessonCampus.replace("衣笠", "KIC")
+				courseCampus = courseCampus.replace("衣笠", "KIC")
 			except:
-				lessonCampus, lessonRoom = "unknown", "unknown"
+				courseCampus, courseRoom = "unknown", "unknown"
 			
 			# Get teacher information
-			lessonTeacherTag = lessonTimeRoomTag.find_next_sibling("td")
-			lessonTeacherString = lessonTeacherTag.get_text()
+			courseTeacherTag = courseTimeRoomTag.find_next_sibling("td")
+			courseTeacherString = courseTeacherTag.get_text()
 
 			# Confirm if there are several teachers in list
-			if "、" in lessonTeacherString:
-				hasServeralTeachers = True
+			if "、" in courseTeacherString:
+				courseTeachers = courseTeacherString.split("、")
+				tempCourseInfo["teacher"] = courseTeachers
 			else:
-				hasServeralTeachers = False
-
-			if hasServeralTeachers:
-				lessonTeachers = lessonTeacherString.split("、")
-			else:
-				lessonTeacher = [lessonTeacherString]
-			
-			# Update information on temporary course information dictionary
-			if hasServeralTeachers:
-				tempCourseInfo["teacher"] = lessonTeachers
-			else:
-				tempCourseInfo["teacher"] = lessonTeacher
+				courseTeacher = [courseTeacherString]
+				tempCourseInfo["teacher"] = courseTeacher
 
 			tempCourseInfo["time"] = {
-				"year": lessonYear,
-				"semester": lessonSemester,
-				"weekday": lessonWeekday,
-				"period": lessonPeriod
+				"year": courseYear,
+				"semester": courseSemester,
+				"weekday": courseWeekday,
+				"period": coursePeriod
 			}
-			tempCourseInfo["campus"] = lessonCampus
-			tempCourseInfo["room"] = lessonRoom
+			tempCourseInfo["campus"] = courseCampus
+			tempCourseInfo["room"] = courseRoom
 			
 			# Append the information of this course into output list
 			self.courseList.append(tempCourseInfo)
 
-	def outputJSON(self, outputPath):
+	def outputAsJSON(self, outputPath):
 		if len(self.courseList) > 0:
 			# Output data if the user has got information of all courses
 			with open(outputPath, 'w+', encoding='utf8') as outfile:

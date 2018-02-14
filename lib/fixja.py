@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-# fixJapanese module of nobo (RitsFun API).
+# fixJapanese module of Nobo (RitsFun API).
 # env: python3
-def convertHalfwidth(inputString):
+def convertHalfwidth(inputString: str) -> str:
 	fixDict = {
 		"　": " ",
 		"１": "1",
@@ -45,8 +45,8 @@ def convertWeekday(inputString):
 		"金曜日": "Friday",
 	}
 	finalString = inputString
-	for jaweek, enweek in convertDict.items():
-		finalString = finalString.replace(jaweek, enweek)
+	for weekJapanese, weekEnglish in convertDict.items():
+		finalString = finalString.replace(weekJapanese, weekEnglish)
 
 	return finalString
 
@@ -54,16 +54,16 @@ def removeLast(inputString):
 	finalString = inputString
 
 	removeList = [
-		"\xa0",
+		"\xa0", # Full-width Space used in Japanese
 		"\n",
 		"\t",
 		" "
 	]
 
-	if (finalString in removeList):
+	if finalString in removeList:
 		finalString = ""
 	else:
-		while (finalString[-1:] in removeList):
-		 	finalString = finalString[:-1]
+		while finalString[-1:] in removeList:
+			finalString = finalString[:-1]
 
 	return finalString

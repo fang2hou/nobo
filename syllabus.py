@@ -14,16 +14,17 @@ from .lib import *
 class syllabusUser(object):
 	"""syllabus Class"""
 	# Setting for syllabus
-	syallabusHomePagePath = "https://campusweb.ritsumei.ac.jp/syllabus/sso/KJgSearchTop.do"
+	syllabusHomePagePath = "https://campusweb.ritsumei.ac.jp/syllabus/sso/KJgSearchTop.do"
 
 	def __init__(self, username, password):
 		self.rainbowID = username
 		self.rainbowPassword = password
 		self.webSession = requests.Session()
+		self.syllabusList = {}
 
 	def login(self):
 		# Load first page using the webSession initialized before
-		firstPage = self.webSession.get(self.syallabusHomePagePath)
+		firstPage = self.webSession.get(self.syllabusHomePagePath)
 		# Initialize the post data for second page
 		secondPagePostData = {
 			"USER": self.rainbowID,
@@ -54,7 +55,7 @@ class syllabusUser(object):
 		}
 
 		# Load third page
-		thirdPage = self.webSession.post(thirdPagePath, thirdPagePostData)
+		self.webSession.post(thirdPagePath, thirdPagePostData)
 
 	def getSyllabusById(self, courseYear, courseID):
 		self.syllabusList = {}
@@ -96,16 +97,7 @@ class syllabusUser(object):
 		basicInfo = []
 
 		if "  " in courseNameString:
-			hasSeveralNames = True
-		else:
-			hasSeveralNames = False
-		
-		if hasSeveralNames:
 			courseNames = courseNameString.split("  ")
-		else:
-			courseName = courseNameString
-
-		if hasSeveralNames:
 			for courseName in courseNames:
 				courseClass = re.findall("\([A-Za-z][0-9]\)", courseName)[0].strip("()")
 				courseName = courseName.split(" (")[0]
@@ -113,6 +105,14 @@ class syllabusUser(object):
 					"name": courseName,
 					"class": courseClass
 				})
+		else:
+			courseName = courseNameString
+			courseClass = re.findall("\([A-Za-z][0-9]\)", courseName)[0].strip("()")
+			courseName = courseName.split(" (")[0]
+			basicInfo.append({
+				"name": courseName,
+				"class": courseClass
+			})
 
 		# Semester
 		semesterTag = basicInfoTag.find_next_sibling("td")
@@ -127,7 +127,7 @@ class syllabusUser(object):
 		# Course Time
 		courseTimeTag = semesterTag.find_next_sibling("td")
 		courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
-		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall("(月|火|水|木|金)([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
+		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall("([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
 		courseWeekday = fixja.convertWeekday(courseWeekday)
 		courseSciPeriod = courseSciPeriod.strip("()")
 		courseTime = {
@@ -149,11 +149,11 @@ class syllabusUser(object):
 
 		# Confirm if there are several teachers in list
 		if "、" in courseTeacherString:
-			hasServeralTeachers = True
+			hasSeveralTeachers = True
 		else:
-			hasServeralTeachers = False
+			hasSeveralTeachers = False
 
-		if hasServeralTeachers:
+		if hasSeveralTeachers:
 			courseTeacher = courseTeacherString.split("、")
 		else:
 			courseTeacher = [courseTeacherString]
@@ -182,11 +182,10 @@ class syllabusUser(object):
 		scheduleList = []
 
 		while tempScheduleTableTag:
-			tempSchedule = {}
 			# Lecture
-			tempSchedule["lecture"] = int(tempScheduleTableTag.find("td").get_text())
+			tempSchedule = {"lecture": int(tempScheduleTableTag.find("td").get_text()), "theme": fixja.removeLast(
+				fixja.convertHalfwidth(tempScheduleTableTag.find("td").find_next_sibling("td").get_text()))}
 			# Theme
-			tempSchedule["theme"] = fixja.removeLast(fixja.convertHalfwidth(tempScheduleTableTag.find("td").find_next_sibling("td").get_text()))
 			tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
 			# Keyword, References and Supplementary Information
 			tempSchedule["references"] = fixja.removeLast(fixja.convertHalfwidth(tempScheduleTableTag.find("td").get_text()))
@@ -335,7 +334,7 @@ class syllabusUser(object):
 			"other_comments": otherComments,
 		}
 
-	def outputJSON(self, outputPath):
+	def outputAsJSON(self, outputPath):
 		if len(self.syllabusList) > 0:
 			# Output data if the user has got information of all courses
 			with open(outputPath, 'w+', encoding='utf8') as outfile:
