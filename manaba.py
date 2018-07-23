@@ -5,32 +5,40 @@
 # Fang2hou @ 2/6/2018
 # github: https://github.com/fang2hou/Nobo
 # ----------------------------------------
-import requests
 import re
 import json
+import time
+import requests
 from bs4 import BeautifulSoup as bs
-from .lib import *
+from .lib import fixja
+from .lib import base
 
 def splitLessonInfo(rawString):
 	# Confirm no space to avoid regex rule
 	rawString = rawString.replace(": ",":")
 	# Use regex to get the name and code of the lesson
-	code, name, classNumber = re.findall("([0-9]*):(.*)\(([A-Z][A-Z0-9])\)", rawString)[0]
+	code, name, classNumber = re.findall(r"([0-9]*):(.*)\(([A-Z][A-Z0-9])\)", rawString)[0]
 	return code, name, classNumber
 
 class manabaUser(object):
-	"""manabaUser Class"""
-	# Setting for manaba+R
-	manabaHomePagePath = "https://ct.ritsumei.ac.jp/ct/home"
+	manabaURL = "https://ct.ritsumei.ac.jp/ct/home"
+	TempDir   = "temp"
+	isLogged  = False
 
 	def __init__(self, username, password):
-		self.rainbowID = username
+		self.rainbowID       = username
 		self.rainbowPassword = password
-		self.webSession = requests.Session()
+		self.webSession      = requests.Session()
+		self.cookiesFile     = self.TempDir + "/cookies/" + base.md5(self.rainbowID + self.rainbowPassword)
+
+		# If logged before, use saved cookies to get data
+		with open(self.cookiesFile, 'rt') as f:
+			self.webSession.cookies.update(json.loads(f.read()))
+			self.CheckLogin()
 
 	def login(self):
 		# Load first page using the webSession initialized before
-		firstPage = self.webSession.get(self.manabaHomePagePath)
+		firstPage = self.webSession.get(self.manabaURL)
 		# Initialize the post data for second page
 		secondPagePostData = {
 			"USER": self.rainbowID,
@@ -76,6 +84,11 @@ class manabaUser(object):
 
 		# Load forth page
 		self.webSession.post(forthPagePath, forthPagePostData)
+	
+	def CheckLogin(self):
+		self.isLogged = True
+		# TODO get cookies filtered with the domain?
+		base.exportAsJson(self.cookiesFile, self.webSession.cookies.get_dict)
 
 	def getCourseList(self):
 		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")

@@ -1,0 +1,8 @@
+{
+    "cacheDirectory": "localdb",
+    "manaba": {
+        "cookiesCache": true,
+        "encryption": "md5",
+        "saveMode": "file"
+    }
+}

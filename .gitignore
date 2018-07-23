@@ -4,8 +4,10 @@
 # Ignore test files
 main.py
 temp.*
+.vscode/*
 
 # Ignore compiled files
+__pycache__/*
 */__pycache__/*
 
 # Ignore other files
