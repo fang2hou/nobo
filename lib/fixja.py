@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
-# fixJapanese module of Nobo (RitsFun API).
-# env: python3
+# Nobo, a third-party Ritsumeikan API
+# 
+# lib/fixja.py
+#
+# The library for fixing some Japanese issue.
+# -------------------------------------------
+# @Author  : Fang2hou
+# @Updated : 7/31/2018
+# @Homepage: https://github.com/fang2hou/Nobo
+# -------------------------------------------
 def convertHalfwidth(inputString: str) -> str:
 	fixDict = {
 		"　": " ",

@@ -1,15 +1,22 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------
-# Manaba module of Nobo
-# Fang2hou @ 2/6/2018
-# github: https://github.com/fang2hou/Nobo
+# Nobo, a third-party Ritsumeikan API
+# 
+# manaba.py
+#
+# Main Manaba module
+# -------------------------------------------
+# @Author  : Fang2hou
+# @Updated : 7/31/2018
+# @Homepage: https://github.com/fang2hou/Nobo
 # ----------------------------------------
 import re
 import json
 import time
 import requests
+
 from bs4 import BeautifulSoup as bs
+
 from .lib import fixja
 from .lib import base
 
@@ -21,19 +28,20 @@ def splitLessonInfo(rawString):
 	return code, name, classNumber
 
 class manabaUser(object):
-	manabaURL = "https://ct.ritsumei.ac.jp/ct/home"
-	TempDir   = "temp"
-	isLogged  = False
-
-	def __init__(self, username, password):
+	def __init__(self, username, password, config_path=None):
 		self.rainbowID       = username
 		self.rainbowPassword = password
-		self.webSession      = requests.Session()
-		self.cookiesFile     = self.TempDir + "/cookies/" + base.md5(self.rainbowID + self.rainbowPassword)
+
+		self.manabaURL  = "https://ct.ritsumei.ac.jp/ct/home"
+		self.isLogged   = False
+		self.webSession = requests.Session()
+		self.config     = base.LoadConfiguration(config_path)
+		self.cacheId    = base.ConvertToMd5(self.rainbowID + self.rainbowPassword)
 
 		# If logged before, use saved cookies to get data
-		with open(self.cookiesFile, 'rt') as f:
-			self.webSession.cookies.update(json.loads(f.read()))
+		savedCookies = base.LoadCookiesFromFile(self.config["cacheDirectory"], self.cacheId)
+		if None != savedCookies:
+			self.webSession.cookies.update(savedCookies)
 			self.CheckLogin()
 
 	def login(self):
@@ -59,6 +67,10 @@ class manabaUser(object):
 		
 		# Load second page
 		secondPage = self.webSession.post("https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData)
+
+		print(secondPage.text)
+
+		return None
 		# Get the redirect path
 		thirdPagePath = "https://sso.ritsumei.ac.jp" + bs(secondPage.text, "html.parser").find('form').attrs["action"]
 		# Create the post data for second page
@@ -88,7 +100,6 @@ class manabaUser(object):
 	def CheckLogin(self):
 		self.isLogged = True
 		# TODO get cookies filtered with the domain?
-		base.exportAsJson(self.cookiesFile, self.webSession.cookies.get_dict)
 
 	def getCourseList(self):
 		coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
