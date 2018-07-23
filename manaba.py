@@ -38,6 +38,18 @@ class manabaUser(object):
 		self.config     = base.LoadConfiguration(config_path)
 		self.cacheId    = base.ConvertToMd5(self.rainbowID + self.rainbowPassword)
 
+
+		self.fakeUserAgent = {
+			'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.124 Safari/537.36',
+			'Connection':'Keep-Alive',
+			'Accept-Language':'en-US,en;q=0.8',
+			'Accept-Encoding':'gzip,deflate,sdch',
+			'Accept':'*/*',
+			'Accept-Charset':'utf-8;q=0.7,*;q=0.3',
+			'Cache-Control':'max-age=0'
+		}
+		self.webSession.headers.update(self.fakeUserAgent)
+
 		# If logged before, use saved cookies to get data
 		savedCookies = base.LoadCookiesFromFile(self.config["cacheDirectory"], self.cacheId)
 		if None != savedCookies:
@@ -46,7 +58,8 @@ class manabaUser(object):
 
 	def login(self):
 		# Load first page using the webSession initialized before
-		firstPage = self.webSession.get(self.manabaURL)
+		firstPage = self.webSession.get(self.manabaURL,headers=self.fakeUserAgent)
+		print(firstPage.text)
 		# Initialize the post data for second page
 		secondPagePostData = {
 			"USER": self.rainbowID,
@@ -67,8 +80,6 @@ class manabaUser(object):
 		
 		# Load second page
 		secondPage = self.webSession.post("https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData)
-
-		print(secondPage.text)
 
 		return None
 		# Get the redirect path
