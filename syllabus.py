@@ -9,7 +9,7 @@ import requests
 import re
 import json
 from bs4 import BeautifulSoup as bs
-from .lib import *
+from .lib import fixja
 
 class syllabusUser(object):
 	"""syllabus Class"""
@@ -99,7 +99,7 @@ class syllabusUser(object):
 		if "  " in courseNameString:
 			courseNames = courseNameString.split("  ")
 			for courseName in courseNames:
-				courseClass = re.findall("\([A-Za-z][0-9]\)", courseName)[0].strip("()")
+				courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip("()")
 				courseName = courseName.split(" (")[0]
 				basicInfo.append({
 					"name": courseName,
@@ -107,7 +107,7 @@ class syllabusUser(object):
 				})
 		else:
 			courseName = courseNameString
-			courseClass = re.findall("\([A-Za-z][0-9]\)", courseName)[0].strip("()")
+			courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip("()")
 			courseName = courseName.split(" (")[0]
 			basicInfo.append({
 				"name": courseName,
@@ -127,7 +127,7 @@ class syllabusUser(object):
 		# Course Time
 		courseTimeTag = semesterTag.find_next_sibling("td")
 		courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
-		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall("([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
+		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall(r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
 		courseWeekday = fixja.convertWeekday(courseWeekday)
 		courseSciPeriod = courseSciPeriod.strip("()")
 		courseTime = {
@@ -292,7 +292,7 @@ class syllabusUser(object):
 			afterString = fixja.removeLast(str(refPageString))
 			if afterString != "":
 				if "<a" in afterString:
-					refPage += re.findall(">(.+)<", afterString)[0]
+					refPage += re.findall(r">(.+)<", afterString)[0]
 					refPage += " "
 				elif afterString == "<br/>":
 					refPage = refPage[:-1] + "\n"
@@ -307,7 +307,7 @@ class syllabusUser(object):
 		contactString = contactTag.find("dd")
 		contactMethods = []
 
-		for contactMethod in re.findall("<b>(.*)／", str(contactString)):
+		for contactMethod in re.findall(r"<b>(.*)／", str(contactString)):
 			contactMethods.append(fixja.removeLast(contactMethod))
 
 		# Other Comments

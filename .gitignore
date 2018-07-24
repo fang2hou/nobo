@@ -3,7 +3,8 @@
 
 # Ignore test files
 main.py
-temp.*
+*test*
+*temp*
 .vscode/*
 
 # Ignore compiled files
@@ -13,3 +14,7 @@ __pycache__/*
 # Ignore other files
 /.idea/*
 /venv/*
+
+# Ignore webdriver
+*chromedriver*
+*phantomjs*

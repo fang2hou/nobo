@@ -16,6 +16,7 @@ import time
 import requests
 
 from bs4 import BeautifulSoup as bs
+from selenium import webdriver
 
 from .lib import fixja
 from .lib import base
@@ -38,7 +39,6 @@ class manabaUser(object):
 		self.config     = base.LoadConfiguration(config_path)
 		self.cacheId    = base.ConvertToMd5(self.rainbowID + self.rainbowPassword)
 
-
 		self.fakeUserAgent = {
 			'User-Agent':'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.124 Safari/537.36',
 			'Connection':'Keep-Alive',
@@ -57,16 +57,25 @@ class manabaUser(object):
 			self.CheckLogin()
 
 	def login(self):
-		# Load first page using the webSession initialized before
-		firstPage = self.webSession.get(self.manabaURL,headers=self.fakeUserAgent)
-		print(firstPage.text)
+		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
+		ritsWebDriver = webdriver.Chrome()
+		ritsWebDriver.implicitly_wait(20)
+		ritsWebDriver.get(self.manabaURL)
+		while not ritsWebDriver.find_element_by_id('web_single_sign-on'):
+			time.sleep(100)
+
+		for cookie in ritsWebDriver.get_cookies():
+			self.webSession.cookies.set(cookie['name'], cookie['value'])
+		
+		firstPage = ritsWebDriver.page_source
+		
 		# Initialize the post data for second page
 		secondPagePostData = {
 			"USER": self.rainbowID,
 			"PASSWORD": self.rainbowPassword
 		}
 		# Update the post data using the given information
-		for inputElement in bs(firstPage.text, "html.parser").find_all('input'):
+		for inputElement in bs(firstPage, "html.parser").find_all('input'):
 			tempAttrDict = inputElement.attrs
 			if "name" in tempAttrDict and "value" in tempAttrDict:
 				if tempAttrDict["name"] == "target":
@@ -80,8 +89,6 @@ class manabaUser(object):
 		
 		# Load second page
 		secondPage = self.webSession.post("https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData)
-
-		return None
 		# Get the redirect path
 		thirdPagePath = "https://sso.ritsumei.ac.jp" + bs(secondPage.text, "html.parser").find('form').attrs["action"]
 		# Create the post data for second page
