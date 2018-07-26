@@ -7,16 +7,16 @@
 # Main Manaba module
 # -------------------------------------------
 # @Author  : Fang2hou
-# @Updated : 7/31/2018
+# @Updated : 7/26/2018
 # @Homepage: https://github.com/fang2hou/Nobo
 # ----------------------------------------
 import re
 import json
-import time
-import requests
 
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options
 
 from .lib import fixja
 from .lib import base
@@ -30,84 +30,45 @@ def splitLessonInfo(rawString):
 
 class manabaUser(object):
 	def __init__(self, username, password, config_path=None):
+		# Initialize user data
 		self.rainbowID       = username
 		self.rainbowPassword = password
 
+		# Initialize configuration
 		self.config     = base.LoadConfiguration(config_path)
 		self.manabaURL  = self.config["manaba"]["homePage"]
 		self.isLogged   = False
 		self.cacheId    = base.ConvertToMd5(self.rainbowID)
 
-		self.webDriver = webdriver.Chrome()
-		self.webDriver.implicitly_wait(self.config["manaba"]["implicitlyWait"])
-
-		# If logged before, use saved cookies to get data
-		# savedCookies = base.LoadCookiesFromFile(self.config["basic"]["cacheDirectory"], self.cacheId)
+		# Initialize webdriver
+		chrome_options   = Options()
+		# TODO:Enable "headless" in release environment
+		# chrome_options.add_argument("--headless")
+		self.webDriver   = webdriver.Chrome(chrome_options=chrome_options)
+		self.waitTimeout = WebDriverWait(self.webDriver, self.config["manaba"]["timeout"], .5)
 
 	def login(self):
+		if True == self.CheckLogin():
+			print("[User: %s] is already logged in. " % self.rainbowID)
+			return
 		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
 		self.webDriver.get(self.manabaURL)
+		findX = self.webDriver.find_element_by_xpath
 
-		loginAttempt = 0
-		while not self.webDriver.find_element_by_id('web_single_sign-on'):
-			if self.config["manaba"]["loginAttemptLimit"] > loginAttempt:
-				time.sleep(100)
-				loginAttempt += 1
-			else:
-				print("login failed. [loginAttemptLimit = %d]") % loginAttempt
-				return
+		try:
+			self.waitTimeout.until(lambda sign:self.webDriver.find_element_by_id("web_single_sign-on"))
+			# Login
+			inputElement = findX("//input[@name='USER']")
+			inputElement.send_keys(self.rainbowID)
+			inputElement = findX("//input[@name='PASSWORD']")
+			inputElement.send_keys(self.rainbowPassword)
+			findX("//input[@id='Submit']").click()
+			self.CheckLogin()
+		except:
+			print("Login timeout.")
 
-		# Update the post data using the given information
-		inputElement = self.webDriver.find_element_by_xpath("//input[@name='USER']")
-		inputElement.send_keys("is0255rx")
-		inputElement = self.webDriver.find_element_by_xpath("//input[@name='PASSWORD']")
-		inputElement.send_keys("1123456")
-
-
-		return
-		# for inputElement in bs(firstPage, "html.parser").find_all('input'):
-		# 	tempAttrDict = inputElement.attrs
-		# 	if "name" in tempAttrDict and "value" in tempAttrDict:
-		# 		if == "target":
-		# 			secondPagePostData["target"] = tempAttrDict["value"]
-		# 		elif tempAttrDict["name"] == "smauthreason":
-		# 			secondPagePostData["smauthreason"] = tempAttrDict["value"]
-		# 		elif tempAttrDict["name"] == "smquerydata":
-		# 			secondPagePostData["smquerydata"] = tempAttrDict["value"]
-		# 		elif tempAttrDict["name"] == "postpreservationdata":
-		# 			secondPagePostData["postpreservationdata"] = tempAttrDict["value"]
-		
-		# # Load second page
-		#  secondPage = self.webSession.post("https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData)
-		# # Get the redirect path
-		# thirdPagePath = "https://sso.ritsumei.ac.jp" + bs(secondPage.text, "html.parser").find('form').attrs["action"]
-		# # Create the post data for second page
-		# thirdPagePostData = {
-		# 	"USER": self.rainbowID,
-		# 	"PASSWORD": self.rainbowPassword,
-		# 	"smquerydata": secondPagePostData["smquerydata"],
-		# }
-
-		# # Load third page
-		#  thirdPage = self.webSession.post(thirdPagePath, thirdPagePostData)
-		# # Initialize the post data for the forth page
-		# forthPagePostData = {}
-		# for inputElement in bs(thirdPage.text, "html.parser").find_all('input'):
-		# 	tempAttrDict = inputElement.attrs
-		# 	if "name" in tempAttrDict and "value" in tempAttrDict:
-		# 		if tempAttrDict["name"] == "RelayState":
-		# 			forthPagePostData["RelayState"] = tempAttrDict["value"].replace("&#x3a;",":").replace("&#x2f;","/"),
-		# 		elif tempAttrDict["name"] == "SAMLResponse":
-		# 			forthPagePostData["SAMLResponse"] = tempAttrDict["value"]
-		# # Evaluate the page of forth page
-		# forthPagePath = bs(thirdPage.text, "html.parser").find('form').attrs["action"].replace("&#x3a;",":").replace("&#x2f;","/")
-
-		# # Load forth page
-		# self.webSession.post(forthPagePath, forthPagePostData)
-	
 	def CheckLogin(self):
-		self.isLogged = True
-		# TODO get cookies filtered with the domain?
+		return True
 
 	def getCourseList(self):
 		#coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")

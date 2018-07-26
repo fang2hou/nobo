@@ -4,7 +4,7 @@
     },
     "manaba": {
         "homePage": "https://ct.ritsumei.ac.jp/ct/home",
-        "implicitlyWait": 20,
+        "timeout": 10,
         "loginAttemptLimit": 5,
         "cookiesCache": true,
         "encryption": "md5",
