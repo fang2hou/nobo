@@ -53,21 +53,25 @@ class manabaUser(object):
 			return
 		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
 		self.webDriver.get(self.manabaURL)
-		findX = self.webDriver.find_element_by_xpath
 
 		try:
 			self.waitTimeout.until(lambda sign:self.webDriver.find_element_by_id("web_single_sign-on"))
-			# Login
-			inputElement = findX("//input[@name='USER']")
-			inputElement.send_keys(self.rainbowID)
-			inputElement = findX("//input[@name='PASSWORD']")
-			inputElement.send_keys(self.rainbowPassword)
-			findX("//input[@id='Submit']").click()
-			self.CheckLogin()
 		except:
-			print("Login timeout.")
+			print("[User: %s] Login timeout." % self.rainbowID)
+			return
+
+		# Login
+		inputElement = self.webDriver.find_element_by_xpath("//input[@name='USER']")
+		inputElement.send_keys(self.rainbowID)
+		inputElement = self.webDriver.find_element_by_xpath("//input[@name='PASSWORD']")
+		inputElement.send_keys(self.rainbowPassword)
+		self.webDriver.find_element_by_xpath("//input[@id='Submit']").click()
+
+		# TODO: Throw an exception if failed
+		# self.CheckLogin()
 
 	def CheckLogin(self):
+		# TODO: Check status
 		return True
 
 	def getCourseList(self):
