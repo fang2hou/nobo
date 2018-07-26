@@ -1,6 +1,11 @@
 {
-    "cacheDirectory": "localdb",
+    "basic":{
+        "cacheDirectory": "localdb"
+    },
     "manaba": {
+        "homePage": "https://ct.ritsumei.ac.jp/ct/home",
+        "implicitlyWait": 20,
+        "loginAttemptLimit": 5,
         "cookiesCache": true,
         "encryption": "md5",
         "saveMode": "file"
