@@ -3,16 +3,16 @@
 
 # Ignore test files
 main.py
-*test*
-*temp*
-.vscode/*
+test*
+temp*
+debug*
 
 # Ignore compiled files
-__pycache__/*
-*/__pycache__/*
+*__pycache__*
 
 # Ignore other files
 /.idea/*
+/*.vscode/*
 /venv/*
 
 # Ignore webdriver
