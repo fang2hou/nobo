@@ -172,7 +172,7 @@ class manabaUser(object):
 				courseCampus = courseCampus.replace("衣笠", "KIC")
 			except:
 				 courseRoom   = courseTimeRoomTag.get_text().strip()
-				 courseCampus = "unknown"
+				#  courseCampus = "unknown"
 			
 			# Get teacher information
 			courseTeacherTag    = courseTimeRoomTag.find_next_sibling("td")
@@ -192,7 +192,7 @@ class manabaUser(object):
 				"weekday": courseWeekday,
 				"period": coursePeriod
 			}
-			tempCourseInfo["campus"] = courseCampus
+			# tempCourseInfo["campus"] = courseCampus
 			tempCourseInfo["room"] = courseRoom
 			
 			# Append the information of this course into output list
