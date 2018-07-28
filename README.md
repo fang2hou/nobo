@@ -4,9 +4,12 @@ It seems Ritsumeikan University started to use f5 obfuscator. So maybe you can a
 
 Even if you are a student of Ritsumeikan University, don't worry about that.  
 The solution now I found is using selenium to rebuild Nobo as a human-like spider.  
-Nobo-ng(Nobo next generation) will be updated in dev branch until it works perfectly.
+Nobo-ng(Nobo next generation) will be updated in `dev` branch until it works perfectly.
 
 Thanks for your concern. 
 
 Fang.
 7/26/2018
+
+### Update
+7/28/2018 [manaba module] Fixed several errors. Now you can use new method to get course list now.
