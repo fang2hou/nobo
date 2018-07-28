@@ -11,5 +11,14 @@ Thanks for your concern.
 Fang.
 7/26/2018
 
-### Update
-7/28/2018 [manaba module] Fixed several errors. Now you can use new method to get course list now.
+### Fix list:
+- [x] [manaba] course list @ 7/28/2018
+- [ ] [syllabus] ritsumei syllabus -> manaba syllabus
+- [ ] [syllabus] get syllabus by id
+
+## New feature:
+- [ ] [manaba] better performance
+- [ ] [syllabus] search syllabus by string
+- [ ] [compusweb] scholarship information
+- [ ] [compusweb] final test information
+- [ ] [compusweb] grade information
