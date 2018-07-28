@@ -49,7 +49,7 @@ class manabaUser(object):
 		self.webDriver   = webdriver.Chrome(chrome_options=chrome_options)
 		self.waitTimeout = WebDriverWait(self.webDriver, self.config["manaba"]["timeout"], self.config["manaba"]["loginAttemptInterval"])
 
-	def login(self):
+	def Login(self):
 		if True == self.CheckLogin():
 			print("[User: %s] is already logged in. " % self.rainbowID)
 			return True
@@ -70,6 +70,7 @@ class manabaUser(object):
 		inputElement.send_keys(self.rainbowPassword)
 		self.webDriver.find_element_by_xpath("//input[@id='Submit']").click()
 
+		# Throw an exception if failed
 		if "AuthError" in self.webDriver.current_url:
 			print("Invalid ID or PASSWORD. Please try again.")
 			return False
@@ -85,9 +86,12 @@ class manabaUser(object):
 		
 		return False
 
-	def getCourseList(self):
-		#coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
-		coursePageCourseTable = bs("s", "html.parser").select(".courselist")[0]
+	def GetCourseList(self):
+		# self.webDriver.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
+		# coursePage = self.webDriver.page_source
+
+		
+		coursePageCourseTable = bs(coursePage, "html.parser").select(".courselist")[0]
 
 		# Initialize the output list
 		self.courseList = []
@@ -200,7 +204,7 @@ class manabaUser(object):
 			# Append the information of this course into output list
 			self.courseList.append(tempCourseInfo)
 
-	def outputAsJSON(self, outputPath):
+	def OutputAsJSON(self, outputPath):
 		if len(self.courseList) > 0:
 			# Output data if the user has got information of all courses
 			with open(outputPath, 'w+', encoding='utf8') as outfile:
