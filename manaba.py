@@ -52,7 +52,7 @@ class manabaUser(object):
 	def login(self):
 		if True == self.CheckLogin():
 			print("[User: %s] is already logged in. " % self.rainbowID)
-			return
+			return True
 
 		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
 		self.webDriver.get(self.manabaHomepage)
@@ -70,8 +70,11 @@ class manabaUser(object):
 		inputElement.send_keys(self.rainbowPassword)
 		self.webDriver.find_element_by_xpath("//input[@id='Submit']").click()
 
-		# TODO: Throw an exception if failed
-		print(self.CheckLogin())
+		if "AuthError" in self.webDriver.current_url:
+			print("Invalid ID or PASSWORD. Please try again.")
+			return False
+	
+		return True
 
 	def CheckLogin(self):
 		self.webDriver.get(self.manabaHomepage)
