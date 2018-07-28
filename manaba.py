@@ -35,24 +35,27 @@ class manabaUser(object):
 		self.rainbowPassword = password
 
 		# Initialize configuration
-		self.config     = base.LoadConfiguration(config_path)
-		self.manabaURL  = self.config["manaba"]["homePage"]
-		self.isLogged   = False
-		self.cacheId    = base.ConvertToMd5(self.rainbowID)
+		self.config         = base.LoadConfiguration(config_path)
+		self.manabaHomepage = self.config["manaba"]["homepage"]
+		self.loginDomain    = self.config["manaba"]["loginDomainRoot"]
+		self.manabaDomain   = self.config["manaba"]["manabaDomainRoot"]
+		self.isLogged       = False
+		self.cacheId        = base.ConvertToMd5(self.rainbowID)
 
 		# Initialize webdriver
 		chrome_options   = Options()
 		# TODO:Enable "headless" in release environment
 		# chrome_options.add_argument("--headless")
 		self.webDriver   = webdriver.Chrome(chrome_options=chrome_options)
-		self.waitTimeout = WebDriverWait(self.webDriver, self.config["manaba"]["timeout"], .5)
+		self.waitTimeout = WebDriverWait(self.webDriver, self.config["manaba"]["timeout"], self.config["manaba"]["loginAttemptInterval"])
 
 	def login(self):
 		if True == self.CheckLogin():
 			print("[User: %s] is already logged in. " % self.rainbowID)
 			return
+
 		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
-		self.webDriver.get(self.manabaURL)
+		self.webDriver.get(self.manabaHomepage)
 
 		try:
 			self.waitTimeout.until(lambda sign:self.webDriver.find_element_by_id("web_single_sign-on"))
@@ -68,11 +71,16 @@ class manabaUser(object):
 		self.webDriver.find_element_by_xpath("//input[@id='Submit']").click()
 
 		# TODO: Throw an exception if failed
-		# self.CheckLogin()
+		print(self.CheckLogin())
 
 	def CheckLogin(self):
-		# TODO: Check status
-		return True
+		self.webDriver.get(self.manabaHomepage)
+
+		if not self.loginDomain in self.webDriver.current_url:
+			if self.manabaDomain in self.webDriver.current_url:
+				return True
+		
+		return False
 
 	def getCourseList(self):
 		#coursePage = self.webSession.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")

@@ -24,16 +24,7 @@ def LoadConfiguration(path=None):
 				
 	Returns:
 		A dict mapping keys to the corresponding table row data
-		fetched.  For example:
-
-		{
-			'cacheDirectory': 'localdb', 
-			'manaba': {
-				'cookiesCache': True,
-				'encryption': 'md5', 
-				'saveMode': 'mysql'
-			}
-		}
+		fetched. 
 	"""
 	defaultConfig = {
 		"cacheDirectory": "localdb",
