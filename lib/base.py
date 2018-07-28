@@ -56,6 +56,6 @@ def ConvertToMd5(str):
 	print(hashlib.md5().hexdigest())
 	return hashlib.md5().hexdigest()
 
-def ExportAsJson(path, content):
+def export_json(path, content):
 	with open(path, 'w+', encoding='utf8') as outfile:
 		json.dump(content, outfile, ensure_ascii=False, indent=4)

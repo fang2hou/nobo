@@ -21,11 +21,11 @@ from selenium.webdriver.chrome.options import Options
 from .lib import fixja
 from .lib import base
 
-def splitLessonInfo(rawString):
+def split_lesson_info(rawString):
 	# Confirm no space to avoid regex rule
 	rawString = rawString.replace(": ",":")
 	# Use regex to get the name and code of the lesson
-	code, name, classNumber = re.findall(r"([0-9]*):(.*)\(([A-Z][A-Z0-9])\)", rawString)[0]
+	code, name, classNumber = re.findall(r"([0-9]*):(.*)\(([A-Z]|[A-Z][A-Z0-9])\)", rawString)[0]
 	return code, name, classNumber
 
 class manabaUser(object):
@@ -45,12 +45,12 @@ class manabaUser(object):
 		# Initialize webdriver
 		chrome_options   = Options()
 		# TODO:Enable "headless" in release environment
-		# chrome_options.add_argument("--headless")
+		chrome_options.add_argument("--headless")
 		self.webDriver   = webdriver.Chrome(chrome_options=chrome_options)
 		self.waitTimeout = WebDriverWait(self.webDriver, self.config["manaba"]["timeout"], self.config["manaba"]["loginAttemptInterval"])
 
-	def Login(self):
-		if True == self.CheckLogin():
+	def login(self):
+		if True == self.check_login():
 			print("[User: %s] is already logged in. " % self.rainbowID)
 			return True
 
@@ -77,7 +77,7 @@ class manabaUser(object):
 	
 		return True
 
-	def CheckLogin(self):
+	def check_login(self):
 		self.webDriver.get(self.manabaHomepage)
 
 		if not self.loginDomain in self.webDriver.current_url:
@@ -86,41 +86,35 @@ class manabaUser(object):
 		
 		return False
 
-	def GetCourseList(self):
-		# self.webDriver.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
-		# coursePage = self.webDriver.page_source
+	def get_course_list(self):
+		self.webDriver.get("https://ct.ritsumei.ac.jp/ct/home_course?chglistformat=list")
+		coursePage = self.webDriver.page_source
 
-		
 		coursePageCourseTable = bs(coursePage, "html.parser").select(".courselist")[0]
-
+		
 		# Initialize the output list
 		self.courseList = []
 
 		# Try to get each lesson information
 		# The first -> 0, last 2 -> -2 is not a lesson (department notice, research etc.)
-		for row in coursePageCourseTable.select(".courselist-c")[1:-2]:
+		for course in coursePageCourseTable.select(".courselist-c")[1:-2]:
 			tempCourseInfo = {}
 
-			lessonNameTag = row.find("td")
+			lessonNameTag = course.find("td")
 			
 			# Convert the name into correct encode
 			courseName = lessonNameTag.select(".courselist-title")[0].get_text()
-			courseName = fixja.convertHalfwidth(courseName)
-			courseName = fixja.removeNewLine(courseName)
+			courseName = fixja.convet_to_half_width(courseName)
+			courseName = fixja.remove_newline(courseName)
 
 			# If the lesson has two names and codes, set the flag to process automatically
 			if "§" in courseName:
-				hasTwoNames = True
-			else:
-				hasTwoNames = False
-
-			# Split the code, name, and class information
-			if hasTwoNames:
+				# Split the code, name, and class information
 				courseNames = courseName.split("§")
 				courseCodes = {}
 				courseClasses = {}
-				courseCodes[0], courseNames[0], courseClasses[0] = splitLessonInfo(courseNames[0])
-				courseCodes[1], courseNames[1], courseClasses[1] = splitLessonInfo(courseNames[1])
+				courseCodes[0], courseNames[0], courseClasses[0] = split_lesson_info(courseNames[0])
+				courseCodes[1], courseNames[1], courseClasses[1] = split_lesson_info(courseNames[1])
 				tempCourseInfo["basic"] = {}
 				tempCourseInfo["basic"] = [{
 					"name": courseNames[0],
@@ -132,14 +126,13 @@ class manabaUser(object):
 					"class": courseClasses[1]
 				}]
 			else:
-				courseCode, courseName, courseClass = splitLessonInfo(courseName)
+				courseCode, courseName, courseClass = split_lesson_info(courseName)
 				tempCourseInfo["two_names"] = "false"
 				tempCourseInfo["basic"] = [{
 					"name": courseName,
 					"code": int(courseCode),
 					"class": courseClass
 				}]
-
 
 			# Get the next node that contains the lesson year information
 			courseYearTag = lessonNameTag.find_next_sibling("td")
@@ -160,8 +153,8 @@ class manabaUser(object):
 
 			# Get the weekday and period information
 			try:
-				courseWeekday, coursePeriod = re.findall("([月|火|水|木|金])([0-9]-[0-9]|[0-9])", courseTimeString)[0]
-				courseWeekday = fixja.convertWeekday(courseWeekday)
+				courseWeekday, coursePeriod = re.findall(r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])", courseTimeString)[0]
+				courseWeekday = fixja.convert_week_to_en(courseWeekday)
 			except:
 				courseWeekday, coursePeriod = "unknown", "unknown"
 
@@ -178,10 +171,11 @@ class manabaUser(object):
 				# Fix if "KIC" written in Kanji.
 				courseCampus = courseCampus.replace("衣笠", "KIC")
 			except:
-				courseCampus, courseRoom = "unknown", "unknown"
+				 courseRoom   = courseTimeRoomTag.get_text().strip()
+				 courseCampus = "unknown"
 			
 			# Get teacher information
-			courseTeacherTag = courseTimeRoomTag.find_next_sibling("td")
+			courseTeacherTag    = courseTimeRoomTag.find_next_sibling("td")
 			courseTeacherString = courseTeacherTag.get_text()
 
 			# Confirm if there are several teachers in list
@@ -203,13 +197,12 @@ class manabaUser(object):
 			
 			# Append the information of this course into output list
 			self.courseList.append(tempCourseInfo)
+		return
 
-	def OutputAsJSON(self, outputPath):
+	def output_course_list(self, outputPath):
 		if len(self.courseList) > 0:
 			# Output data if the user has got information of all courses
-			with open(outputPath, 'w+', encoding='utf8') as outfile:
-				# Fix Kanji issue, set indent as 4
-				json.dump(self.courseList, outfile, ensure_ascii=False, indent=4)
+			base.export_json(outputPath, self.courseList)
 		else:
 			# Notify when output without information of courses
 			print("Use the getCourseList() method to get data first.")

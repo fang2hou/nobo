@@ -9,7 +9,7 @@
 # @Updated : 7/31/2018
 # @Homepage: https://github.com/fang2hou/Nobo
 # -------------------------------------------
-def convertHalfwidth(inputString: str) -> str:
+def convet_to_half_width(inputString: str) -> str:
 	fixDict = {
 		"　": " ",
 		"１": "1",
@@ -30,11 +30,11 @@ def convertHalfwidth(inputString: str) -> str:
 		finalString = finalString.replace(full, half)
 	return finalString
 
-def removeNewLine(inputString):
+def remove_newline(inputString):
 	finalString = inputString.replace("\n", "")
 	return finalString
 
-def convertWeekday(inputString):
+def convert_week_to_en(inputString):
 	convertDict = {
 		"月": "Monday",
 		"火": "Tuesday",
@@ -58,7 +58,7 @@ def convertWeekday(inputString):
 
 	return finalString
 
-def removeLast(inputString):
+def remove_last_space(inputString):
 	finalString = inputString
 
 	removeList = [

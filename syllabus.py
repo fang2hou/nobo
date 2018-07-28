@@ -92,8 +92,8 @@ class syllabusUser(object):
 		# Start of processing
 		# Basic
 		basicInfoTag = syllabusPageHeadTag.select(".jugyo_table")[0].find("tr").find_next_sibling("tr").find("td")
-		courseNameString = fixja.removeLast(basicInfoTag.get_text().strip("\t\n "))
-		courseNameString = fixja.convertHalfwidth(courseNameString)
+		courseNameString = fixja.remove_last_space(basicInfoTag.get_text().strip("\t\n "))
+		courseNameString = fixja.convet_to_half_width(courseNameString)
 		basicInfo = []
 
 		if "  " in courseNameString:
@@ -128,7 +128,7 @@ class syllabusUser(object):
 		courseTimeTag = semesterTag.find_next_sibling("td")
 		courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
 		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall(r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
-		courseWeekday = fixja.convertWeekday(courseWeekday)
+		courseWeekday = fixja.convert_week_to_en(courseWeekday)
 		courseSciPeriod = courseSciPeriod.strip("()")
 		courseTime = {
 			"year": courseYear,
@@ -145,7 +145,7 @@ class syllabusUser(object):
 		# Teacher
 		courseTeacherTag = creditTag.find_next_sibling("td")
 		courseTeacherString = courseTeacherTag.get_text()
-		courseTeacherString = fixja.removeLast(courseTeacherString.replace("\t", "").replace("\n", "").strip(" "))
+		courseTeacherString = fixja.remove_last_space(courseTeacherString.replace("\t", "").replace("\n", "").strip(" "))
 
 		# Confirm if there are several teachers in list
 		if "、" in courseTeacherString:
@@ -160,7 +160,7 @@ class syllabusUser(object):
 
 		# Course Outline and Method
 		outlineTag = syllabusPageHeadTag.find("dl")
-		outline = fixja.removeLast(outlineTag.find("dd").get_text())
+		outline = fixja.remove_last_space(outlineTag.find("dd").get_text())
 		
 		# Student Attainment Objectives
 		objectivesTag = outlineTag.find_next_sibling("dl")
@@ -173,7 +173,7 @@ class syllabusUser(object):
 		
 		# Recommended Preparatory Course
 		preCourseTag = objectivesTag.find_next_sibling("dl")
-		precourse = fixja.removeLast(preCourseTag.find("dd").get_text())
+		precourse = fixja.remove_last_space(preCourseTag.find("dd").get_text())
 
 		# Course Schedule
 		scheduleTableTag = preCourseTag.find_next_sibling("dl")
@@ -183,19 +183,19 @@ class syllabusUser(object):
 
 		while tempScheduleTableTag:
 			# Lecture
-			tempSchedule = {"lecture": int(tempScheduleTableTag.find("td").get_text()), "theme": fixja.removeLast(
-				fixja.convertHalfwidth(tempScheduleTableTag.find("td").find_next_sibling("td").get_text()))}
+			tempSchedule = {"lecture": int(tempScheduleTableTag.find("td").get_text()), "theme": fixja.remove_last_space(
+				fixja.convet_to_half_width(tempScheduleTableTag.find("td").find_next_sibling("td").get_text()))}
 			# Theme
 			tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
 			# Keyword, References and Supplementary Information
-			tempSchedule["references"] = fixja.removeLast(fixja.convertHalfwidth(tempScheduleTableTag.find("td").get_text()))
+			tempSchedule["references"] = fixja.remove_last_space(fixja.convet_to_half_width(tempScheduleTableTag.find("td").get_text()))
 			tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
 
 			scheduleList.append(tempSchedule)
 		
 		# Recommendations for Private Study
 		recommendationTag = scheduleTableTag.find_next_sibling("dl")
-		recommendation = fixja.removeLast(recommendationTag.find("dd").get_text())
+		recommendation = fixja.remove_last_space(recommendationTag.find("dd").get_text())
 		
 		# Grade Evaluation Method
 		gradeEvaluationTag = recommendationTag.find_next_sibling("dl")
@@ -216,7 +216,7 @@ class syllabusUser(object):
 
 		for row in gradeEveluationTableTag.find_all("tr")[1:]:
 			percentage = int(row.select(".percentage")[0].get_text().replace("%", ""))
-			gradeNote = fixja.removeLast(row.select(".top")[0].get_text())
+			gradeNote = fixja.remove_last_space(row.select(".top")[0].get_text())
 			gradeEvaluation["data"].append({
 				"type": gradeType[gradeTypeIndex],
 				"percentage": percentage,
@@ -226,12 +226,12 @@ class syllabusUser(object):
 
 		gradeEvaluationNoteTag = gradeEveluationTableTag.find_next_sibling("dl")
 		gradeEvaluationNote = gradeEvaluationNoteTag.find("dd").get_text()
-		gradeEvaluationNote = fixja.removeLast(gradeEvaluationNote)
+		gradeEvaluationNote = fixja.remove_last_space(gradeEvaluationNote)
 		gradeEvaluation["note"] = gradeEvaluationNote
 
 		# Advice to Students on Study and Research Methods
 		adviceTag = gradeEvaluationTag.find_next_sibling("dl")
-		advice = fixja.removeLast(adviceTag.find("dd").get_text())
+		advice = fixja.remove_last_space(adviceTag.find("dd").get_text())
 
 		# Textbooks
 		textBookTag = adviceTag.find_next_sibling("dl")
@@ -246,17 +246,17 @@ class syllabusUser(object):
 				tempTextBook = {}
 				tempTag = row
 				tempTag = tempTag.find("td")
-				tempTextBook["title"] = fixja.removeLast(tempTag.get_text()).replace("\n", "")
+				tempTextBook["title"] = fixja.remove_last_space(tempTag.get_text()).replace("\n", "")
 				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["author"] = fixja.removeLast(tempTag.get_text())
+				tempTextBook["author"] = fixja.remove_last_space(tempTag.get_text())
 				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["publisher"] = fixja.removeLast(tempTag.get_text())
+				tempTextBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
 				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["ISBN"] = fixja.removeLast(tempTag.get_text()).replace("ISBN","")
+				tempTextBook["ISBN"] = fixja.remove_last_space(tempTag.get_text()).replace("ISBN","")
 				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["comment"] = fixja.removeLast(tempTag.get_text())
+				tempTextBook["comment"] = fixja.remove_last_space(tempTag.get_text())
 				textBooks["book"].append(tempTextBook)
-		textBooks["note"] = fixja.removeLast(textBookTag.find_all("dd", class_="nest")[0].get_text())
+		textBooks["note"] = fixja.remove_last_space(textBookTag.find_all("dd", class_="nest")[0].get_text())
 
 		# Reference Books
 		refBookTag = textBookTag.find_next_sibling("dl")
@@ -271,17 +271,17 @@ class syllabusUser(object):
 				tempRefBook = {}
 				tempTag = row
 				tempTag = tempTag.find("td")
-				tempRefBook["title"] = fixja.removeLast(tempTag.get_text()).replace("\n", "")
+				tempRefBook["title"] = fixja.remove_last_space(tempTag.get_text()).replace("\n", "")
 				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["author"] = fixja.removeLast(tempTag.get_text())
+				tempRefBook["author"] = fixja.remove_last_space(tempTag.get_text())
 				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["publisher"] = fixja.removeLast(tempTag.get_text())
+				tempRefBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
 				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["ISBN"] = fixja.removeLast(tempTag.get_text()).replace("ISBN","")
+				tempRefBook["ISBN"] = fixja.remove_last_space(tempTag.get_text()).replace("ISBN","")
 				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["comment"] = fixja.removeLast(tempTag.get_text())
+				tempRefBook["comment"] = fixja.remove_last_space(tempTag.get_text())
 				refBooks["book"].append(tempRefBook)
-		refBooks["note"] = fixja.removeLast(refBookTag.find_all("dd", class_="nest")[0].get_text())
+		refBooks["note"] = fixja.remove_last_space(refBookTag.find_all("dd", class_="nest")[0].get_text())
 		
 		# Web Pages for Reference
 		refPageTag = refBookTag.find_next_sibling("dl")
@@ -289,7 +289,7 @@ class syllabusUser(object):
 		refPage = ""
 
 		for refPageString in refPageStrings:
-			afterString = fixja.removeLast(str(refPageString))
+			afterString = fixja.remove_last_space(str(refPageString))
 			if afterString != "":
 				if "<a" in afterString:
 					refPage += re.findall(r">(.+)<", afterString)[0]
@@ -300,7 +300,7 @@ class syllabusUser(object):
 					refPage += afterString
 					refPage += " "
 
-		refPage = fixja.removeLast(refPage)
+		refPage = fixja.remove_last_space(refPage)
 
 		# How to Communicate with the Instructor In and Out of Class(Including Instructor Contact Information)
 		contactTag = refPageTag.find_next_sibling("dl")
@@ -308,11 +308,11 @@ class syllabusUser(object):
 		contactMethods = []
 
 		for contactMethod in re.findall(r"<b>(.*)／", str(contactString)):
-			contactMethods.append(fixja.removeLast(contactMethod))
+			contactMethods.append(fixja.remove_last_space(contactMethod))
 
 		# Other Comments
 		otherCommentsTag = contactTag.find_next_sibling("dl")
-		otherComments = fixja.removeLast(otherCommentsTag.find("dd").get_text())
+		otherComments = fixja.remove_last_space(otherCommentsTag.find("dd").get_text())
 
 		# Save as dictionary
 		self.syllabusList = {
