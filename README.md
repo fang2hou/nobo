@@ -1,6 +1,6 @@
 # Nobo
 The project is stopped since the Javascript code inside page has been confused,  :(   
-It seems Ritsumeikan University started to use f5 obfuscator. So maybe you can also use Nobo to build your unique back-end apps.  
+It seems only Ritsumeikan University deployed f5 obfuscator. So maybe you can also use Nobo to build your unique back-end apps.  
 
 Even if you are a student of Ritsumeikan University, don't worry about that.  
 The solution now I found is using selenium to rebuild Nobo as a human-like spider.  
