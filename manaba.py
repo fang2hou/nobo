@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-# ----------------------------------------
+# -------------------------------------------
 # Nobo, a third-party Manaba API for Ritsumeikan
 # 
 # manaba.py
 # Main Manaba module
 # -------------------------------------------
 # @Author  : Zhou Fang
-# @Updated : 1/28/2018
+# @Updated : 1/28/2019
 # @Homepage: https://github.com/fang2hou/Nobo
-# ----------------------------------------
+# -------------------------------------------
 import re
 import json
 
@@ -20,20 +20,49 @@ from selenium.webdriver.chrome.options import Options
 from .lib import fixja
 from .lib import base
 
+# -------------------------------------------
+# Parser function
+# -------------------------------------------
 def parse_course_info(raw_str):
-	# Confirm no space to avoid regex rule
 	raw_str = raw_str.replace(": ",":")
-	# Use regex to get the name and code of the lesson
+	# Use regex to get the name and code of the course
 	info_str_format = r"([0-9]*):(.*)\(([A-Z]|[A-Z][0-9]|[0-9][A-Z])\)"
 	code, name, class_order = re.findall(info_str_format, raw_str)[0]
 	return code, name, class_order
 
 def parse_course_time(raw_str):
-	# Use regex to get the name and code of the lesson
-	time_str_format = r"([月|火|水|木|金])([0-9])\(([0-9]{1,2})-([0-9]{1,2})\)"
-	weekday, period, sci_period_start, sci_period_end = re.findall(time_str_format, raw_str)[0]
+	try:
+		# Science
+		time_str_format = r"([月|火|水|木|金])([0-9]{1,2})\(([0-9]{1,2})-([0-9]{1,2})\)"
+		weekday, period, sci_period_start, sci_period_end = re.findall(time_str_format, raw_str)[0]
+	except:
+		# Arts
+		try:
+			time_str_format = r"([月|火|水|木|金])([0-9]{1,2})"
+			weekday, period = re.findall(time_str_format, raw_str)[0]
+			sci_period_start, sci_period_end = "unknown", "unknown"
+		except:
+			weekday, period, sci_period_start, sci_period_end = "unknown", "unknown", "unknown", "unknown"
+
+	weekday = fixja.translate_weekday(weekday)
 	return weekday, period, sci_period_start, sci_period_end
 
+# NOTICE: This function is unused since campus info has been deleted
+def parse_course_room_with_campus(raw_str):
+	try:
+		time_str_format = r"([衣笠|KIC|BKC|OIC]) ([.*])"
+		campus, room  = re.findall(time_str_format, raw_str)[0]
+		# Fix if "KIC" written in Kanji.
+		campus = campus.replace("衣笠", "KIC")
+	except:
+		# Other course
+		campus, room = "unknown", "unknown"
+
+	return campus, room
+
+# -------------------------------------------
+# ManabaUser Class
+# -------------------------------------------
 class ManabaUser(object):
 	def __init__(self, username, password, config_path=None):
 		# Initialize user data
@@ -99,15 +128,15 @@ class ManabaUser(object):
 		# Initialize the output list
 		self.course_list = []
 
-		# Try to get each lesson information
-		# The first -> 0, last 2 -> -2 is not a lesson (department notice, research etc.)
+		# Try to get each course information
+		# The first -> 0, last 2 -> -2 is not a course (department notice, research etc.)
 		for course_table_line in course_table_body.select(".courselist-c"):
 
 			# Initialize the course
 			temp_course = {}
 
 			# Academic year
-			#------------------------------
+			# -------------------------------------------
 			# If the acdemic year is missed, it shows this line is not a course, maybe a page
 			academic_year_tag = course_table_line.find("td").find_next_sibling("td")
 			if "" == academic_year_tag.get_text():
@@ -116,14 +145,13 @@ class ManabaUser(object):
 				academic_year = int(academic_year_tag.get_text())
 
 			# Course name
-			#------------------------------
+			# -------------------------------------------
 			course_name_tag = course_table_line.find("td")
 			# Convert the name into correct encode
 			course_name_text = course_name_tag.select(".courselist-title")[0].get_text()
-			course_name_text = fixja.convet_to_half_width(course_name_text)
-			course_name_text = fixja.remove_newline(course_name_text)
+			course_name_text = fixja.convet_to_half_width(course_name_text).strip()
 
-			# If the lesson has two names and codes, set the flag to process automatically
+			# If the course has two names and codes, set the flag to process automatically
 			if "§" in course_name_text:
 				# Split the code, name, and class information
 				course_names = course_name_text.split("§")
@@ -147,63 +175,57 @@ class ManabaUser(object):
 					"name": course_name,
 					"class": course_class
 				}]
+
 			
-			# Get the next node that contains lesson time and classroom information
+			# Course time
+			# -------------------------------------------
+			# Get the next node that contains course time and classroom information
 			course_time_room_tag = academic_year_tag.find_next_sibling("td")
 			course_time_text  = course_time_room_tag.find("span").get_text()
-			
-			# Get the semester information
+
 			if "春" in course_time_text:
-				courseSemester = "spring"
+				course_semester = "spring"
 			elif "秋" in course_time_text:
-				courseSemester = "fall"
+				course_semester = "fall"
 			else:
-				courseSemester = "unknown"
+				course_semester = "unknown"
 
-			# Get the weekday and period information
-			try:
-				courseWeekday, coursePeriod = re.findall(r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])", course_time_text)[0]
-				courseWeekday = fixja.convert_week_to_en(courseWeekday)
-			except:
-				courseWeekday, coursePeriod = "unknown", "unknown"
-
-			try:
-				# Delete useless tags
-				course_time_room_tag.span.extract()
-				course_time_room_tag.br.extract()
-			except:
-				raise
-			
-			try:
-				# Split the campus and room information
-				courseCampus, courseRoom = re.findall("(衣笠|BKC|OIC) (.*)", course_time_room_tag.get_text())[0]
-				# Fix if "KIC" written in Kanji.
-				courseCampus = courseCampus.replace("衣笠", "KIC")
-			except:
-				 courseRoom   = course_time_room_tag.get_text().strip()
-				#  courseCampus = "unknown"
-			
-			# Get teacher information
-			courseTeacherTag    = course_time_room_tag.find_next_sibling("td")
-			courseTeacherString = courseTeacherTag.get_text()
-
-			# Confirm if there are several teachers in list
-			if "、" in courseTeacherString:
-				courseTeachers = courseTeacherString.split("、")
-				temp_course["teacher"] = courseTeachers
-			else:
-				courseTeacher = [courseTeacherString]
-				temp_course["teacher"] = courseTeacher
+			course_weekday, course_period, course_sci_period_start, course_sci_period_end = parse_course_time(course_time_text)
 
 			temp_course["time"] = {
 				"year": academic_year,
-				"semester": courseSemester,
-				"weekday": courseWeekday,
-				"period": coursePeriod
+				"semester": course_semester,
+				"weekday": course_weekday,
+				"period": course_period,
+				"sci_period_start": course_sci_period_start,
+				"sci_period_end": course_sci_period_end,
 			}
-			# tempCourseInfo["campus"] = courseCampus
-			temp_course["room"] = courseRoom
-			
+
+			# Course room
+			# -------------------------------------------
+			# Delete time tags
+			try:				
+				course_time_room_tag.span.extract()
+				course_time_room_tag.br.extract()
+				course_room = course_time_room_tag.get_text().strip()
+			except:
+				print("Nobo: something wrong with deleting useless tags.")
+				course_room = "unknown"
+			temp_course["room"] = course_room
+
+			# Course teacher
+			# -------------------------------------------
+			course_teacher_tag    = course_time_room_tag.find_next_sibling("td")
+			course_teacher_text = course_teacher_tag.get_text()
+
+			# Confirm if there are several teachers in list
+			if "、" in course_teacher_text:
+				course_teachers = course_teacher_text.split("、")
+				temp_course["teacher"] = course_teachers
+			else:
+				course_teacher = [course_teacher_text]
+				temp_course["teacher"] = course_teacher
+
 			# Append the information of this course into output list
 			self.course_list.append(temp_course)
 		return
@@ -211,7 +233,10 @@ class ManabaUser(object):
 	def output_course_list(self, outputPath):
 		if len(self.course_list) > 0:
 			# Output data if the user has got information of all courses
-			base.export_dict_as_json(outputPath, self.course_list)
+			if base.export_dict_as_json(outputPath, self.course_list):
+				print("Nobo: course list saved in %s." % outputPath)
+			else:
+				print("Nobo: save course list failed.")
 		else:
 			# Notify when output without information of courses
 			print("Use the getCourseList() method to get data first.")

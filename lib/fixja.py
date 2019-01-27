@@ -34,8 +34,8 @@ def remove_newline(inputString):
 	finalString = inputString.replace("\n", "")
 	return finalString
 
-def convert_week_to_en(inputString):
-	convertDict = {
+def translate_weekday(string):
+	convert_dict = {
 		"月": "Monday",
 		"火": "Tuesday",
 		"水": "Wednesday",
@@ -52,26 +52,24 @@ def convert_week_to_en(inputString):
 		"木曜日": "Thursday",
 		"金曜日": "Friday",
 	}
-	finalString = inputString
-	for weekJapanese, weekEnglish in convertDict.items():
-		finalString = finalString.replace(weekJapanese, weekEnglish)
 
-	return finalString
+	for jp, en in convert_dict.items():
+		string = string.replace(jp, en)
 
-def remove_last_space(inputString):
-	finalString = inputString
+	return string
 
-	removeList = [
+def remove_last_space(string):
+	remove_list = [
 		"\xa0", # Full-width Space used in Japanese
 		"\n",
 		"\t",
 		" "
 	]
 
-	if finalString in removeList:
-		finalString = ""
+	if string in remove_list:
+		string = ""
 	else:
-		while finalString[-1:] in removeList:
-			finalString = finalString[:-1]
+		while string[-1:] in remove_list:
+			string = string[:-1]
 
-	return finalString
+	return string
