@@ -4,9 +4,9 @@
     },
     "manaba": {
         "homepage"            : "https://ct.ritsumei.ac.jp/ct/home",
-        "loginDomainRoot"     : "sso.ritsumei.ac.jp",
-        "manabaDomainRoot"    : "ct.ritsumei.ac.jp",
-        "loginAttemptInterval": 0.5,
+        "login_domain_root"   : "sso.ritsumei.ac.jp",
+        "domain_root"         : "ct.ritsumei.ac.jp",
+        "login_attempt_interval": 0.5,
         "timeout"             : 10,
         "cookiesCache"        : true,
         "encryption"          : "md5",

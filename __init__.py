@@ -1,2 +1,1 @@
-from .manaba import manabaUser
-from .syllabus import syllabusUser
+from .manaba import ManabaUser

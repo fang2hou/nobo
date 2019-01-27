@@ -68,9 +68,9 @@ def export_dict_as_json(path, content):
 		The result of saving.
 	"""
 
-	if type(content) != dict:
+	if type(content) != list:
 		print("Error: [Export Dict as JSON] The given data is not a dictionary.")
-	return False
+		return False
 
 	with open(path, 'w+', encoding='utf8') as outfile:
 		file_accessed = True
