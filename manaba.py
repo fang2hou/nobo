@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 # ----------------------------------------
-# Nobo, a third-party Ritsumeikan API
+# Nobo, a third-party Manaba API for Ritsumeikan
 # 
 # manaba.py
-#
 # Main Manaba module
 # -------------------------------------------
-# @Author  : Fang2hou
-# @Updated : 7/26/2018
+# @Author  : Zhou Fang
+# @Updated : 1/28/2018
 # @Homepage: https://github.com/fang2hou/Nobo
 # ----------------------------------------
 import re
@@ -35,12 +34,12 @@ class manabaUser(object):
 		self.rainbowPassword = password
 
 		# Initialize configuration
-		self.config         = base.LoadConfiguration(config_path)
-		self.manabaHomepage = self.config["manaba"]["homepage"]
-		self.loginDomain    = self.config["manaba"]["loginDomainRoot"]
-		self.manabaDomain   = self.config["manaba"]["manabaDomainRoot"]
-		self.isLogged       = False
-		self.cacheId        = base.ConvertToMd5(self.rainbowID)
+		self.config          = base.load_config(path=config_path)
+		self.manaba_homepage = self.config["manaba"]["homepage"]
+		self.login_domain     = self.config["manaba"]["login_domain_root"]
+		self.manabaDomain    = self.config["manaba"]["manabaDomainRoot"]
+		self.isLogged        = False
+		self.cacheId         = base.ConvertToMd5(self.rainbowID)
 
 		# Initialize webdriver
 		chrome_options   = Options()
@@ -55,7 +54,7 @@ class manabaUser(object):
 			return True
 
 		# Use webdrive to run Javascript code inside first page of sso.ritsumei.ac.jp
-		self.webDriver.get(self.manabaHomepage)
+		self.webDriver.get(self.manaba_homepage)
 
 		try:
 			self.waitTimeout.until(lambda sign:self.webDriver.find_element_by_id("web_single_sign-on"))
@@ -78,9 +77,9 @@ class manabaUser(object):
 		return True
 
 	def check_login(self):
-		self.webDriver.get(self.manabaHomepage)
+		self.webDriver.get(self.manaba_homepage)
 
-		if not self.loginDomain in self.webDriver.current_url:
+		if not self.login_domain in self.webDriver.current_url:
 			if self.manabaDomain in self.webDriver.current_url:
 				return True
 		

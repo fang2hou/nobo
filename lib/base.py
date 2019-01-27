@@ -13,33 +13,34 @@ import os
 import json
 import hashlib
 
-def LoadConfiguration(path=None):
-	"""Load configration from file.
-		
-	The configration should be a valid json file.
-	If you do not give the path, Nobo will load default configration.
+def load_config(path=None):
+	"""
+	Load configuration from file.
+
+	The configuration should be a valid JSON file.
+	If the path is empty, Nobo will load default configuration.
 
 	Args:
-		path: the location that configration file is. 
-				
+		path: the location that configuration file is. 
+
 	Returns:
-		A dict mapping keys to the corresponding table row data
-		fetched. 
+		A dict mapping keys to the corresponding table row data fetched. 
 	"""
-	defaultConfig = {
-		"cacheDirectory": "localdb",
+
+	default_config = {
+		"cache_dir": "localdb",
 		"manaba": {
-			"cookiesCache": True,
+			"cookies_cache": True,
 			"encryption": "md5",
-			"saveMode": "file"
+			"sava_mode": "file"
 		}
 	}
 
 	if None != path:
-		with open(path, 'r') as f:
-			return json.loads(f.read())
-	else:
-		return defaultConfig
+		with open(path, 'r') as configuration:
+			return json.loads(configuration.read())
+	
+	return default_config
 
 def LoadCookiesFromFile(cacheDirectory, fileId):
 	if not os.path.isdir(cacheDirectory + "/cookies/"):
@@ -51,11 +52,32 @@ def LoadCookiesFromFile(cacheDirectory, fileId):
 	except FileNotFoundError:
 		return None
 
-def ConvertToMd5(str):
+def convert_to_md5(str):
 	hashlib.md5().update(str.encode("utf8"))
-	print(hashlib.md5().hexdigest())
 	return hashlib.md5().hexdigest()
 
-def export_json(path, content):
+def export_dict_as_json(path, content):
+	"""
+	Export data in a dictionary type variable as JSON format.
+
+	Args:
+		path: the location of output file.
+		content: a dict type variable
+
+	Returns:
+		The result of saving.
+	"""
+
+	if type(content) != dict:
+		print("Error: [Export Dict as JSON] The given data is not a dictionary.")
+	return False
+
 	with open(path, 'w+', encoding='utf8') as outfile:
+		file_accessed = True
 		json.dump(content, outfile, ensure_ascii=False, indent=4)
+
+	if file_accessed:
+		return True
+	else:
+		print("Error: [Export Dict as JSON] Cannot access the file.")
+		return False
