@@ -9,6 +9,7 @@
 # @Updated : 1/28/2019
 # @Homepage: https://github.com/fang2hou/Nobo
 # -------------------------------------------
+import sys
 import re
 import json
 
@@ -64,7 +65,7 @@ def parse_course_room_with_campus(raw_str):
 # RitsStudent Class
 # -------------------------------------------
 class RitsStudent(object):
-	def __init__(self, username, password, config_path=None, webdriver_path="chromedriver"):
+	def __init__(self, username, password, config_path=None, webdriver_path=None):
 		# Initialize user data
 		self.username = username
 		self.password = password
@@ -77,7 +78,10 @@ class RitsStudent(object):
 		# Initialize webdriver
 		# NOTICE: Enable "headless" in release environment
 		chrome_options   = Options()
-		# chrome_options.add_argument("--headless")
+		chrome_options.add_argument("--headless")
+
+		if None == webdriver_path:
+			webdriver_path = sys.path[0]+"/chromedriver"
 		self.webdriver   = webdriver.Chrome(chrome_options=chrome_options, executable_path=webdriver_path)
 		self.wait_time_out = WebDriverWait(self.webdriver, self.config["manaba"]["timeout"], self.config["manaba"]["login_attempt_interval"])
 
