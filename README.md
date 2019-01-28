@@ -1,9 +1,9 @@
-# Nobo
-"Nobo" means "No Borders", also means "登る" in Japanese.
+# nobo
+"nobo" means "No Borders", also means "登る" in Japanese.
 
-**Nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
+**nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
 
-You can use **Nobo** to build your API with many frameworks (`Flask`, `Django` etc.) under GPLv3 License.
+You can use **nobo** to build your API with many frameworks (`Flask`, `Django` etc.) under GPLv3 License.
 
 # NOTICE:
 Ritsumeikan University deployed f5 obfuscator several months ago. :(  
@@ -37,22 +37,22 @@ Recommended Python Version: 3.7.1+
     ```bash
     pip install -r requirements.txt
     ```
-3. Use **Nobo** in your project (.py).
+3. Use **nobo** in your project (.py).
     ```python
-    import Nobo
+    import nobo
     # if you wanna output in an easy way
-    import Nobo.io
+    import nobo.io
     ```
 
 # Manaba Spider
-It seems that Manaba of each school are different, you can change a little bit code inside [manaba.py](manaba.py) to let Nobo be compatible with your manaba page.
+It seems that Manaba of each school are different, you can change a little bit code inside [manaba.py](manaba.py) to let nobo be compatible with your manaba page.
 
 ## How to use
 1. Create a `RitsStudent` instance.
 
     ```python
     # The following username and password is not real :)
-    fangzhou = Nobo.RitsStudent("is0000ab", "12345678")
+    fangzhou = nobo.RitsStudent("is0000ab", "12345678")
     ```
 
 2. Use `get_course_list()` method to get all courses information.  
@@ -61,7 +61,7 @@ It seems that Manaba of each school are different, you can change a little bit c
     ```python
     try:
         course_list = fangzhou.get_course_list()
-        Nobo.io.export_as_json("temp.json", course_list)
+        nobo.io.export_as_json("temp.json", course_list)
     except:
         exit()
     ```

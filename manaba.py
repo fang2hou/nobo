@@ -52,10 +52,11 @@ def parse_course_time(raw_str):
     weekday = fixja.translate_weekday(weekday)
     return weekday, period, sci_period_start, sci_period_end
 
-# NOTICE: This function is unused since campus info has been deleted
+
 
 
 def parse_course_room_with_campus(raw_str):
+    # NOTICE: This function is unused since campus info has been deleted
     try:
         time_str_format = r"([衣笠|KIC|BKC|OIC]) ([.*])"
         campus, room = re.findall(time_str_format, raw_str)[0]
@@ -67,12 +68,13 @@ def parse_course_room_with_campus(raw_str):
 
     return campus, room
 
-# -------------------------------------------
-# RitsStudent Class
-# -------------------------------------------
+
 
 
 class RitsStudent(object):
+    # -------------------------------------------
+    # RitsStudent Class
+    # -------------------------------------------
     def __init__(self, username, password, config_path=None, webdriver_path=None):
         # Initialize user data
         self.username = username
