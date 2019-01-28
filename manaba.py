@@ -234,5 +234,5 @@ class RitsStudent(object):
 			# Append the information of this course into output list
 			course_list.append(temp_course)
 		
-		base.debug_print("Nobo: Done! [get courses list]")
+		base.debug_print("Nobo: Done! [get course list]")
 		return course_list
