@@ -64,7 +64,7 @@ def parse_course_room_with_campus(raw_str):
 # RitsStudent Class
 # -------------------------------------------
 class RitsStudent(object):
-	def __init__(self, username, password, config_path=None):
+	def __init__(self, username, password, config_path=None, webdriver_path="chromedriver"):
 		# Initialize user data
 		self.username = username
 		self.password = password
@@ -78,7 +78,7 @@ class RitsStudent(object):
 		# NOTICE: Enable "headless" in release environment
 		chrome_options   = Options()
 		# chrome_options.add_argument("--headless")
-		self.webdriver   = webdriver.Chrome(chrome_options=chrome_options)
+		self.webdriver   = webdriver.Chrome(chrome_options=chrome_options, executable_path=webdriver_path)
 		self.wait_time_out = WebDriverWait(self.webdriver, self.config["manaba"]["timeout"], self.config["manaba"]["login_attempt_interval"])
 
 	def login(self):
@@ -235,4 +235,5 @@ class RitsStudent(object):
 			course_list.append(temp_course)
 		
 		base.debug_print("Nobo: Done! [get course list]")
+		self.webdriver.close()
 		return course_list

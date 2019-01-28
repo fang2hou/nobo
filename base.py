@@ -10,6 +10,7 @@
 # @Homepage: https://github.com/fang2hou/Nobo
 # -------------------------------------------
 import os
+import sys
 import json
 import hashlib
 
@@ -40,6 +41,7 @@ def load_config(path=None):
 
 	if None != path:
 		with open(path, 'r') as configuration:
+			print("ff")
 			return json.loads(configuration.read())
 	
 	return default_config
