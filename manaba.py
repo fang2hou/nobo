@@ -17,8 +17,8 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 
-from .lib import fixja
-from .lib import base
+from . import fixja
+from . import base
 
 # -------------------------------------------
 # Parser function
@@ -63,7 +63,7 @@ def parse_course_room_with_campus(raw_str):
 # -------------------------------------------
 # ManabaUser Class
 # -------------------------------------------
-class ManabaUser(object):
+class RitsStudent(object):
 	def __init__(self, username, password, config_path=None):
 		# Initialize user data
 		self.username = username
@@ -120,16 +120,21 @@ class ManabaUser(object):
 		return True
 
 	def get_course_list(self):
-		# Parse the course page with html parser
+		if not self.login():
+			base.debug_print("Nobo: Login process is failed.")
+			return
+
+		base.debug_print("Nobo: Login successful, start to get courses.")
 		self.webdriver.get(self.config["manaba"]["homepage"]+"_course?chglistformat=list")
 		course_page = self.webdriver.page_source
 		course_table_body = bs(course_page, "html.parser").select(".courselist")[0]
 		
 		# Initialize the output list
-		self.course_list = []
+		course_list = []
 
 		# Try to get each course information
 		# The first -> 0, last 2 -> -2 is not a course (department notice, research etc.)
+		base.debug_print("Nobo: Start to parse table of courses.")
 		for course_table_line in course_table_body.select(".courselist-c"):
 
 			# Initialize the course
@@ -209,7 +214,7 @@ class ManabaUser(object):
 				course_time_room_tag.br.extract()
 				course_room = course_time_room_tag.get_text().strip()
 			except:
-				print("Nobo: something wrong with deleting useless tags.")
+				base.debug_print("Nobo: Something wrong with deleting useless tags.")
 				course_room = "unknown"
 			temp_course["room"] = course_room
 
@@ -227,16 +232,7 @@ class ManabaUser(object):
 				temp_course["teacher"] = course_teacher
 
 			# Append the information of this course into output list
-			self.course_list.append(temp_course)
-		return
-
-	def output_course_list(self, outputPath):
-		if len(self.course_list) > 0:
-			# Output data if the user has got information of all courses
-			if base.export_dict_as_json(outputPath, self.course_list):
-				print("Nobo: course list saved in %s." % outputPath)
-			else:
-				print("Nobo: save course list failed.")
-		else:
-			# Notify when output without information of courses
-			print("Use the getCourseList() method to get data first.")
+			course_list.append(temp_course)
+		
+		base.debug_print("Nobo: Done! [get courses list]")
+		return course_list

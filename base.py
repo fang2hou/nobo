@@ -13,6 +13,8 @@ import os
 import json
 import hashlib
 
+DEBUG = True
+
 def load_config(path=None):
 	"""
 	Load configuration from file.
@@ -56,28 +58,6 @@ def convert_to_md5(str):
 	hashlib.md5().update(str.encode("utf8"))
 	return hashlib.md5().hexdigest()
 
-def export_dict_as_json(path, content):
-	"""
-	Export data in a dictionary type variable as JSON format.
-
-	Args:
-		path: the location of output file.
-		content: a dict type variable
-
-	Returns:
-		The result of saving.
-	"""
-
-	if type(content) != list:
-		print("Error: [Export Dict as JSON] The given data is not a dictionary.")
-		return False
-
-	with open(path, 'w+', encoding='utf8') as outfile:
-		file_accessed = True
-		json.dump(content, outfile, ensure_ascii=False, indent=4)
-
-	if file_accessed:
-		return True
-	else:
-		print("Error: [Export Dict as JSON] Cannot access the file.")
-		return False
+def debug_print(str):
+	if DEBUG:
+		print(str)

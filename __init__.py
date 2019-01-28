@@ -1,1 +1,5 @@
-from .manaba import ManabaUser
+from .manaba import RitsStudent
+
+__all__ = [
+    'io',
+]
