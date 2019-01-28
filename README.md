@@ -34,15 +34,17 @@ __GPLv3__
 
 # How to import?
 1. Install Python 3.  
-Recommended Python Version: 3.7.1+  
+Recommended Python Version: 3.7.1+
 2. Install `nobo` with `pip` / `pip3`
+
     ```bash
     pip3 install nobo
     ```
 3. Install latest version of Chrome and ChromeDriver
    - [Chrome](https://www.google.com/chrome/), latest version is recommended
    - [ChromeDriver](http://chromedriver.chromium.org/downloads), unzip and move `chromedriver`/`chromedriver.exe` into your project directory.
-1. Use **nobo** in your project (.py).
+4. Use **nobo** in your project (.py).
+
     ```python
     import nobo
     # if you wanna output in an easy way
