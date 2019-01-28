@@ -77,11 +77,14 @@ class RitsStudent(object):
 		
 		# Initialize webdriver
 		# NOTICE: Enable "headless" in release environment
-		chrome_options   = Options()
+		chrome_options = Options()
 		chrome_options.add_argument("--headless")
+		chrome_options.add_argument("--silent")
+		chrome_options.add_argument("--log-level=3")
 
 		if None == webdriver_path:
 			webdriver_path = sys.path[0]+"/chromedriver"
+
 		self.webdriver   = webdriver.Chrome(chrome_options=chrome_options, executable_path=webdriver_path)
 		self.wait_time_out = WebDriverWait(self.webdriver, self.config["manaba"]["timeout"], self.config["manaba"]["login_attempt_interval"])
 
