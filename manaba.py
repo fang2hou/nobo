@@ -61,7 +61,7 @@ def parse_course_room_with_campus(raw_str):
 	return campus, room
 
 # -------------------------------------------
-# ManabaUser Class
+# RitsStudent Class
 # -------------------------------------------
 class RitsStudent(object):
 	def __init__(self, username, password, config_path=None):

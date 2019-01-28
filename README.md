@@ -17,7 +17,7 @@ The difference between `legacy version` and `ng version`(New Generation):
 
 ## Fix list:
 - [x] [manaba] course list @ 7/28/2018
-- [x] [manaba] better performance @ 1/28/2018
+- [x] [manaba] better performance @ 1/28/2019
 - [ ] [syllabus] ritsumei syllabus -> manaba syllabus
 - [ ] [syllabus] get syllabus by id
 
@@ -40,7 +40,7 @@ Recommended Python Version: 3.7.1+
 3. Use **Nobo** in your project (.py).
     ```python
     import Nobo
-    # if you wanna output in a easy way
+    # if you wanna output in an easy way
     import Nobo.io
     ```
 
