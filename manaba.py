@@ -53,8 +53,6 @@ def parse_course_time(raw_str):
     return weekday, period, sci_period_start, sci_period_end
 
 
-
-
 def parse_course_room_with_campus(raw_str):
     # NOTICE: This function is unused since campus info has been deleted
     try:
@@ -67,8 +65,6 @@ def parse_course_room_with_campus(raw_str):
         campus, room = "unknown", "unknown"
 
     return campus, room
-
-
 
 
 class RitsStudent(object):

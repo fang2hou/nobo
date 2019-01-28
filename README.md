@@ -1,4 +1,6 @@
 # nobo
+![](https://img.shields.io/badge/Ritsumeikan%20University-API-blue.svg?colorA=990000&colorB=444444&longCache=true&style=flat) ![](https://img.shields.io/badge/Python-3.7.1-green.svg?longCache=true&style=flat) ![](https://img.shields.io/badge/Chrome-WebDriver-blue.svg?logo=Google%20Chrome&style=flat)
+
 "nobo" means "No Borders", also means "登る" in Japanese.
 
 **nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
@@ -30,14 +32,17 @@ The difference between `legacy version` and `ng version`(New Generation):
 # License
 __GPLv3__
 
-# How to use?
+# How to import?
 1. Install Python 3.  
 Recommended Python Version: 3.7.1+  
-2. Install requirements with pip(or pip3).  
+2. Install `nobo` with `pip` / `pip3`
     ```bash
-    pip install -r requirements.txt
+    pip3 install nobo
     ```
-3. Use **nobo** in your project (.py).
+3. Install latest version of Chrome and ChromeDriver
+   - [Chrome](https://www.google.com/chrome/), latest version is recommended
+   - [ChromeDriver](http://chromedriver.chromium.org/downloads), unzip and move `chromedriver`/`chromedriver.exe` into your project directory.
+1. Use **nobo** in your project (.py).
     ```python
     import nobo
     # if you wanna output in an easy way
