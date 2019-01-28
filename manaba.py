@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------
-# Nobo, a third-party Manaba API for Ritsumeikan
+# nobo, No Borders
 #
 # manaba.py
 # Main Manaba module
 # -------------------------------------------
 # @Author  : Zhou Fang
 # @Updated : 1/28/2019
-# @Homepage: https://github.com/fang2hou/Nobo
+# @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import sys
 import re

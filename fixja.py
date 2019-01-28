@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-# Nobo, a third-party Ritsumeikan API
-#
-# lib/fixja.py
-#
-# The library for fixing some Japanese issue.
 # -------------------------------------------
-# @Author  : Fang2hou
-# @Updated : 7/31/2018
-# @Homepage: https://github.com/fang2hou/Nobo
+# nobo, No Borders
+#
+# fixja.py
+# A collection of Japanese character issue fixing functions.
 # -------------------------------------------
-
+# @Author  : Zhou Fang
+# @Updated : 1/28/2019
+# @Homepage: https://github.com/fang2hou/nobo
+# -------------------------------------------
 
 def convet_to_half_width(inputString: str) -> str:
     fixDict = {

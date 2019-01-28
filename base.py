@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-# Nobo, a third-party Ritsumeikan API
-#
-# lib/base.py
-#
-# The library including some useful functions.
 # -------------------------------------------
-# @Author  : Fang2hou
-# @Updated : 7/31/2018
-# @Homepage: https://github.com/fang2hou/Nobo
+# nobo, No Borders
+#
+# fixja.py
+# A collection of useful basic functions.
+# -------------------------------------------
+# @Author  : Zhou Fang
+# @Updated : 1/28/2019
+# @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import os
 import sys
