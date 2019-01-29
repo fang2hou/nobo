@@ -56,18 +56,18 @@ It seems that Manaba of each school are different, you can change a little bit c
 1. Create a `RitsStudent` instance.
 
     ```python
-    # The following username and password is not real :)
     fangzhou = nobo.RitsStudent("is0000ab", "12345678")
     ```
 
 2. Use `get_course_list()` method to get all courses information.  
-`get_course_list()` will login automatically. After parsing, it will return a list that contains all information of courses.
+`get_course_list()` will login automatically. After parsing, it will return a list that contains all information of courses.  
+Use `try...except...finally...` to handle exceptions is highly recommanded.
 
     ```python
     try:
         course_list = fangzhou.get_course_list()
         nobo.io.export_as_json("temp.json", course_list)
-    except:
+    finally:
         exit()
     ```
 

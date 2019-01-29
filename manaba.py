@@ -262,6 +262,6 @@ class RitsStudent(object):
             # Append the information of this course into output list
             course_list.append(temp_course)
 
-        base.debug_print("[nobo][{}] Courses list got.".format(self.username))
+        base.debug_print("[nobo][{}] Course list got.".format(self.username))
         self.webdriver.close()
         return course_list
