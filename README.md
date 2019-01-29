@@ -1,8 +1,9 @@
-# nobo, **N**o **B**orders
+# nobo, No Borders
 ![](https://img.shields.io/badge/Ritsumeikan%20University-API-blue.svg?colorA=990000&colorB=444444&longCache=true&style=flat) ![](https://img.shields.io/badge/Python-3.7.1-green.svg?longCache=true&style=flat) ![](https://img.shields.io/badge/Chrome-WebDriver-blue.svg?logo=Google%20Chrome&style=flat)
 
-**nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
+**This is a personal open source project. Please use `nobo` at your own risk.**
 
+**nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.  
 You can use **nobo** to build your own data API with many frameworks(`Flask`, `Django` etc.).
 
 # NOTICE:
