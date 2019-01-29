@@ -87,6 +87,7 @@ class RitsStudent(object):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--silent")
         chrome_options.add_argument("--log-level=3")
+        chrome_options.add_argument("--blink-settings=imagesEnabled=false")
 
         if None == webdriver_path:
             webdriver_path = sys.path[0]+"/chromedriver"
