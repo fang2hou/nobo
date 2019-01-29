@@ -32,11 +32,18 @@ def load_config(path=None):
     """
 
     default_config = {
-        "cache_dir": "localdb",
+        "basic":{
+            "local_cache_dir": "localdb"
+        },
         "manaba": {
+            "homepage": "https://ct.ritsumei.ac.jp/ct/home",
+            "domain_root": "ct.ritsumei.ac.jp",
+            "login_domain_root": "sso.ritsumei.ac.jp",
+            "login_attempt_interval": 0.5,
+            "timeout": 10,
             "cookies_cache": True,
             "encryption": "md5",
-            "sava_mode": "file"
+            "save_mode": "file"
         }
     }
 
