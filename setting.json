@@ -1,15 +1,15 @@
 {
     "basic":{
-        "cacheDirectory": "localdb"
+        "local_cache_dir": "localdb"
     },
     "manaba": {
         "homepage"              : "https://ct.ritsumei.ac.jp/ct/home",
-        "login_domain_root"     : "sso.ritsumei.ac.jp",
         "domain_root"           : "ct.ritsumei.ac.jp",
+        "login_domain_root"     : "sso.ritsumei.ac.jp",
         "login_attempt_interval": 0.5,
         "timeout"               : 10,
-        "cookiesCache"          : true,
+        "cookies_cache"         : true,
         "encryption"            : "md5",
-        "saveMode"              : "file"
+        "save_mode"             : "file"
     }
 }

@@ -6,7 +6,7 @@
 # A collection of i/o operation functions.
 # -------------------------------------------
 # @Author  : Zhou Fang
-# @Updated : 1/28/2019
+# @Updated : 1/29/2019
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import json
@@ -23,6 +23,8 @@ def export_as_json(path, content):
     Returns:
             The result of saving.
     """
+    file_accessed = False
+
     with open(path, 'w+', encoding='utf8') as outfile:
         file_accessed = True
         json.dump(content, outfile, ensure_ascii=False, indent=4)
@@ -30,5 +32,5 @@ def export_as_json(path, content):
     if file_accessed:
         return True
     else:
-        print("Error: [Export as JSON] Cannot access the file.")
+        print("[nobo.io][Export as JSON] Error: Cannot access the file.")
         return False

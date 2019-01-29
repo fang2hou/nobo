@@ -6,7 +6,7 @@
 # Main Manaba module
 # -------------------------------------------
 # @Author  : Zhou Fang
-# @Updated : 1/28/2019
+# @Updated : 1/29/2019
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import sys
@@ -262,6 +262,6 @@ class RitsStudent(object):
             # Append the information of this course into output list
             course_list.append(temp_course)
 
-        base.debug_print("[nobo][{}] Courses list got.".format(self.username))
+        base.debug_print("[nobo][{}] Course list got.".format(self.username))
         self.webdriver.close()
         return course_list

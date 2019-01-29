@@ -1,8 +1,9 @@
-# nobo, **N**o **B**orders
+# nobo, No Borders
 ![](https://img.shields.io/badge/Ritsumeikan%20University-API-blue.svg?colorA=990000&colorB=444444&longCache=true&style=flat) ![](https://img.shields.io/badge/Python-3.7.1-green.svg?longCache=true&style=flat) ![](https://img.shields.io/badge/Chrome-WebDriver-blue.svg?logo=Google%20Chrome&style=flat)
 
-**nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
+**This is a personal open source project. Please use `nobo` at your own risk.**
 
+**nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.  
 You can use **nobo** to build your own data API with many frameworks(`Flask`, `Django` etc.).
 
 # NOTICE:
@@ -55,18 +56,18 @@ It seems that Manaba of each school are different, you can change a little bit c
 1. Create a `RitsStudent` instance.
 
     ```python
-    # The following username and password is not real :)
     fangzhou = nobo.RitsStudent("is0000ab", "12345678")
     ```
 
 2. Use `get_course_list()` method to get all courses information.  
-`get_course_list()` will login automatically. After parsing, it will return a list that contains all information of courses.
+`get_course_list()` will login automatically. After parsing, it will return a list that contains all information of courses.  
+Use `try...except...finally...` to handle exceptions is highly recommanded.
 
     ```python
     try:
         course_list = fangzhou.get_course_list()
         nobo.io.export_as_json("temp.json", course_list)
-    except:
+    finally:
         exit()
     ```
 
