@@ -105,17 +105,17 @@ class RitsStudent(object):
         if not self.config["manaba"]["login_domain_root"] in self.webdriver.current_url:
             if self.config["manaba"]["domain_root"] in self.webdriver.current_url:
                 # The page is not redirect to the login page, it shows Nobo is in
-                print("Nobo: Already login. [User: %s]" % self.username)
+                base.debug_print("[nobo][{}] Already login.".format(self.username))
                 return True
 
-        print("Nobo: Try to login... [User: %s]" % self.username)
+        base.debug_print("[nobo][{}] Try to login...".format(self.username))
 
         # Wait for login button rendering
         try:
             self.wait_time_out.until(
                 lambda sign: self.webdriver.find_element_by_id("web_single_sign-on"))
         except:
-            print("Nobo: Login timeout. [User: %s]" % self.username)
+            base.debug_print("[nobo][{}] Login timeout.".format(self.username))
             return
 
         # Enter username
@@ -133,17 +133,17 @@ class RitsStudent(object):
 
         # Send a message if username or password is not correct
         if "AuthError" in self.webdriver.current_url:
-            print("Nobo: Invalid ID or PASSWORD. [User: %s]")
+            base.debug_print("[nobo][{}]  Invalid ID or PASSWORD. ".format(self.username))
             return False
 
         return True
 
     def get_course_list(self):
         if not self.login():
-            base.debug_print("Nobo: Login process is failed.")
+            base.debug_print("[nobo][{}] Error: Login process is failed.".format(self.username))
             return
 
-        base.debug_print("Nobo: Login successful, start to get courses.")
+        base.debug_print("[nobo][{}] Login successful, start to get courses.".format(self.username))
         self.webdriver.get(
             self.config["manaba"]["homepage"]+"_course?chglistformat=list")
         course_page = self.webdriver.page_source
@@ -155,7 +155,7 @@ class RitsStudent(object):
 
         # Try to get each course information
         # The first -> 0, last 2 -> -2 is not a course (department notice, research etc.)
-        base.debug_print("Nobo: Start to parse table of courses.")
+        base.debug_print("[nobo][{}] Start to parse table of courses.".format(self.username))
         for course_table_line in course_table_body.select(".courselist-c"):
 
             # Initialize the course
@@ -242,7 +242,7 @@ class RitsStudent(object):
                 course_room = course_time_room_tag.get_text().strip()
             except:
                 base.debug_print(
-                    "Nobo: Something wrong with deleting useless tags.")
+                    "[nobo][{}] Something wrong with deleting useless tags.".format(self.username))
                 course_room = "unknown"
             temp_course["room"] = course_room
 
@@ -262,6 +262,6 @@ class RitsStudent(object):
             # Append the information of this course into output list
             course_list.append(temp_course)
 
-        base.debug_print("Nobo: Done! [get course list]")
+        base.debug_print("[nobo][{}] Courses list got.".format(self.username))
         self.webdriver.close()
         return course_list
