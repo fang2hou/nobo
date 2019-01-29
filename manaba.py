@@ -6,7 +6,7 @@
 # Main Manaba module
 # -------------------------------------------
 # @Author  : Zhou Fang
-# @Updated : 1/28/2019
+# @Updated : 1/29/2019
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import sys
