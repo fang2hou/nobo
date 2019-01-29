@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+# -------------------------------------------
+# nobo, No Borders
+#
+# io.py
+# A collection of i/o operation functions.
+# -------------------------------------------
+# @Author  : Zhou Fang
+# @Updated : 1/28/2019
+# @Homepage: https://github.com/fang2hou/nobo
+# -------------------------------------------
 import json
 
 

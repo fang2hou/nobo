@@ -1,21 +1,18 @@
-# nobo
+# nobo, **N**o **B**orders
 ![](https://img.shields.io/badge/Ritsumeikan%20University-API-blue.svg?colorA=990000&colorB=444444&longCache=true&style=flat) ![](https://img.shields.io/badge/Python-3.7.1-green.svg?longCache=true&style=flat) ![](https://img.shields.io/badge/Chrome-WebDriver-blue.svg?logo=Google%20Chrome&style=flat)
-
-"nobo" means "No Borders", also means "登る" in Japanese.
 
 **nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
 
-You can use **nobo** to build your API with many frameworks (`Flask`, `Django` etc.) under GPLv3 License.
+You can use **nobo** to build your own data API with many frameworks(`Flask`, `Django` etc.).
 
 # NOTICE:
 Ritsumeikan University deployed f5 obfuscator several months ago. :(  
 Although, I don't know the situation in other schools. The truth is legacy version cannot work perfectly nowadays.  
 But if you wanna build your own spider with legacy version, please check the `legacy` branch.
 
-The difference between `legacy version` and `ng version`(New Generation):  
-1. `legacy version` use `requests` to send requests, but `ng version` use webdriver.
-2. `legacy version` cannot handle the page with code confusion.
-3. `legacy version` is faster to get the data if no code confusion.
+The mainly difference between `legacy` version and `master` version:  
+1. `legacy` use `requests` to send requests, but `master` use webdriver for Chrome.
+2. `legacy` is faster, but it cannot handle the page with code confusion.
 
 ## Fix list:
 - [x] [manaba] course list @ 7/28/2018
