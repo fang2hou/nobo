@@ -5,341 +5,382 @@
 # Fang2hou @ 2/7/2018
 # github: https://github.com/fang2hou/Nobo
 # ----------------------------------------
-import requests
-import re
 import json
+import re
+from typing import Any, Dict
+
+import requests
 from bs4 import BeautifulSoup as bs
+
 from .lib import fixja
 
+
 class syllabusUser(object):
-	"""syllabus Class"""
-	# Setting for syllabus
-	syllabusHomePagePath = "https://campusweb.ritsumei.ac.jp/syllabus/sso/KJgSearchTop.do"
+    """syllabus Class"""
 
-	def __init__(self, username, password):
-		self.rainbowID = username
-		self.rainbowPassword = password
-		self.webSession = requests.Session()
-		self.syllabusList = {}
+    # Setting for syllabus
+    syllabusHomePagePath = (
+        "https://campusweb.ritsumei.ac.jp/syllabus/sso/KJgSearchTop.do"
+    )
 
-	def login(self):
-		# Load first page using the webSession initialized before
-		firstPage = self.webSession.get(self.syllabusHomePagePath)
-		# Initialize the post data for second page
-		secondPagePostData = {
-			"USER": self.rainbowID,
-			"PASSWORD": self.rainbowPassword
-		}
-		# Update the post data using the given information
-		for inputElement in bs(firstPage.text, "html.parser").find_all('input'):
-			tempAttrDict = inputElement.attrs
-			if "name" in tempAttrDict and "value" in tempAttrDict:
-				if tempAttrDict["name"] == "target":
-					secondPagePostData["target"] = tempAttrDict["value"]
-				elif tempAttrDict["name"] == "smauthreason":
-					secondPagePostData["smauthreason"] = tempAttrDict["value"]
-				elif tempAttrDict["name"] == "smquerydata":
-					secondPagePostData["smquerydata"] = tempAttrDict["value"]
-				elif tempAttrDict["name"] == "postpreservationdata":
-					secondPagePostData["postpreservationdata"] = tempAttrDict["value"]
-		
-		# Load second page
-		secondPage = self.webSession.post("https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData)
-		# Get the redirect path
-		thirdPagePath = "https://sso.ritsumei.ac.jp" + bs(secondPage.text, "html.parser").find('form').attrs["action"]
-		# Create the post data for second page
-		thirdPagePostData = {
-			"USER": self.rainbowID,
-			"PASSWORD": self.rainbowPassword,
-			"smquerydata": secondPagePostData["smquerydata"],
-		}
+    def __init__(self, username: str, password: str) -> None:
+        self.rainbowID = username
+        self.rainbowPassword = password
+        self.webSession: requests.Session = requests.Session()
+        self.syllabusList: Dict[str, Any] = {}
 
-		# Load third page
-		self.webSession.post(thirdPagePath, thirdPagePostData)
+    def login(self) -> None:
+        # Load first page using the webSession initialized before
+        firstPage = self.webSession.get(self.syllabusHomePagePath)
+        # Initialize the post data for second page
+        secondPagePostData = {"USER": self.rainbowID, "PASSWORD": self.rainbowPassword}
+        # Update the post data using the given information
+        for inputElement in bs(firstPage.text, "html.parser").find_all("input"):
+            tempAttrDict = inputElement.attrs
+            if "name" in tempAttrDict and "value" in tempAttrDict:
+                if tempAttrDict["name"] == "target":
+                    secondPagePostData["target"] = tempAttrDict["value"]
+                elif tempAttrDict["name"] == "smauthreason":
+                    secondPagePostData["smauthreason"] = tempAttrDict["value"]
+                elif tempAttrDict["name"] == "smquerydata":
+                    secondPagePostData["smquerydata"] = tempAttrDict["value"]
+                elif tempAttrDict["name"] == "postpreservationdata":
+                    secondPagePostData["postpreservationdata"] = tempAttrDict["value"]
 
-	def getSyllabusById(self, courseYear, courseID):
-		self.syllabusList = {}
+        # Load second page
+        secondPage = self.webSession.post(
+            "https://sso.ritsumei.ac.jp/cgi-bin/pwexpcheck.cgi", secondPagePostData
+        )
+        # Get the redirect path
+        thirdPagePath = (
+            "https://sso.ritsumei.ac.jp"
+            + bs(secondPage.text, "html.parser").find("form").attrs["action"]
+        )
+        # Create the post data for second page
+        thirdPagePostData = {
+            "USER": self.rainbowID,
+            "PASSWORD": self.rainbowPassword,
+            "smquerydata": secondPagePostData["smquerydata"],
+        }
 
-		syllabusAllInfoPagePath = "https://syllabus.ritsumei.ac.jp/syllabus/sso/SyShowAll.do"
+        # Load third page
+        self.webSession.post(thirdPagePath, thirdPagePostData)
 
-		# Get all information about this course with (sylNendo, jyugyocd, kinouID)
-		postData = {
-			"mkjgkbcd": "",
-			"daibuncd": "",
-			"tyubuncd": "",
-			"shobuncd": "",
-			"sylNendo": courseYear,
-			"jyugyocd": courseID,
-			"kinouID": 'SKJ070',
-		}
+    def getSyllabusById(self, courseYear: str, courseID: str) -> None:
 
-		# Save page source
-		syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
-		syllabusPageHeadTag = bs(syllabusPage.text, "html.parser")
+        self.syllabusList = {}
 
-		# FOR DEBUG
-		# ---------------------------------
-		# # get file and save -------------
-		# syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
-		# with open("temp.html", "w+") as f:
-		# 	f.write(syllabusPage.text)
-		# return 
+        syllabusAllInfoPagePath = (
+            "https://syllabus.ritsumei.ac.jp/syllabus/sso/SyShowAll.do"
+        )
 
-		# # fake data ---------------------
-		# with open("temp.html", "r") as inputFile:
-		# 	syllabusPageHeadTag = bs(inputFile.read(), "html.parser")
+        # Get all information about this course with (sylNendo, jyugyocd, kinouID)
+        postData = {
+            "mkjgkbcd": "",
+            "daibuncd": "",
+            "tyubuncd": "",
+            "shobuncd": "",
+            "sylNendo": courseYear,
+            "jyugyocd": courseID,
+            "kinouID": "SKJ070",
+        }
 
-		# Start of processing
-		# Basic
-		basicInfoTag = syllabusPageHeadTag.select(".jugyo_table")[0].find("tr").find_next_sibling("tr").find("td")
-		courseNameString = fixja.remove_last_space(basicInfoTag.get_text().strip("\t\n "))
-		courseNameString = fixja.convet_to_half_width(courseNameString)
-		basicInfo = []
+        # Save page source
+        syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
+        syllabusPageHeadTag = bs(syllabusPage.text, "html.parser")
 
-		if "  " in courseNameString:
-			courseNames = courseNameString.split("  ")
-			for courseName in courseNames:
-				courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip("()")
-				courseName = courseName.split(" (")[0]
-				basicInfo.append({
-					"name": courseName,
-					"class": courseClass
-				})
-		else:
-			courseName = courseNameString
-			courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip("()")
-			courseName = courseName.split(" (")[0]
-			basicInfo.append({
-				"name": courseName,
-				"class": courseClass
-			})
+        # FOR DEBUG
+        # ---------------------------------
+        # # get file and save -------------
+        # syllabusPage = self.webSession.post(syllabusAllInfoPagePath, postData)
+        # with open("temp.html", "w+") as f:
+        # 	f.write(syllabusPage.text)
+        # return
 
-		# Semester
-		semesterTag = basicInfoTag.find_next_sibling("td")
-		semesterString = semesterTag.get_text()
-		if "前期" in semesterString:
-			courseSemester = "spring"
-		elif "後期" in semesterString:
-			courseSemester = "fall"
-		else:
-			courseSemester = "unknown"
+        # # fake data ---------------------
+        # with open("temp.html", "r") as inputFile:
+        # 	syllabusPageHeadTag = bs(inputFile.read(), "html.parser")
 
-		# Course Time
-		courseTimeTag = semesterTag.find_next_sibling("td")
-		courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
-		courseWeekday, courseArtPeriod, courseSciPeriod = re.findall(r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString)[0]
-		courseWeekday = fixja.convert_week_to_en(courseWeekday)
-		courseSciPeriod = courseSciPeriod.strip("()")
-		courseTime = {
-			"year": courseYear,
-			"semester": courseSemester,
-			"weekday": courseWeekday,
-			"period_art": courseArtPeriod,
-			"period_sci": courseSciPeriod,
-		}
-		
-		# Credit
-		creditTag = courseTimeTag.find_next_sibling("td")
-		credit = int(creditTag.get_text())
+        # Start of processing
+        # Basic
+        basicInfoTag = (
+            syllabusPageHeadTag.select(".jugyo_table")[0]
+            .find("tr")
+            .find_next_sibling("tr")
+            .find("td")
+        )
+        courseNameString = fixja.remove_last_space(
+            basicInfoTag.get_text().strip("\t\n ")
+        )
+        courseNameString = fixja.convet_to_half_width(courseNameString)
+        basicInfo = []
 
-		# Teacher
-		courseTeacherTag = creditTag.find_next_sibling("td")
-		courseTeacherString = courseTeacherTag.get_text()
-		courseTeacherString = fixja.remove_last_space(courseTeacherString.replace("\t", "").replace("\n", "").strip(" "))
+        if "  " in courseNameString:
+            courseNames = courseNameString.split("  ")
+            for courseName in courseNames:
+                courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip(
+                    "()"
+                )
+                courseName = courseName.split(" (")[0]
+                basicInfo.append({"name": courseName, "class": courseClass})
+        else:
+            courseName = courseNameString
+            courseClass = re.findall(r"\([A-Za-z][0-9]\)", courseName)[0].strip("()")
+            courseName = courseName.split(" (")[0]
+            basicInfo.append({"name": courseName, "class": courseClass})
 
-		# Confirm if there are several teachers in list
-		if "、" in courseTeacherString:
-			hasSeveralTeachers = True
-		else:
-			hasSeveralTeachers = False
+        # Semester
+        semesterTag = basicInfoTag.find_next_sibling("td")
+        semesterString = semesterTag.get_text()
+        if "前期" in semesterString:
+            courseSemester = "spring"
+        elif "後期" in semesterString:
+            courseSemester = "fall"
+        else:
+            courseSemester = "unknown"
 
-		if hasSeveralTeachers:
-			courseTeacher = courseTeacherString.split("、")
-		else:
-			courseTeacher = [courseTeacherString]
+        # Course Time
+        courseTimeTag = semesterTag.find_next_sibling("td")
+        courseTimeString = courseTimeTag.get_text().replace("\t", "").replace("\n", "")
+        courseWeekday, courseArtPeriod, courseSciPeriod = re.findall(
+            r"([月|火|水|木|金])([0-9]-[0-9]|[0-9])(\([0-9]-[0-9]\))", courseTimeString
+        )[0]
+        courseWeekday = fixja.convert_week_to_en(courseWeekday)
+        courseSciPeriod = courseSciPeriod.strip("()")
+        courseTime = {
+            "year": courseYear,
+            "semester": courseSemester,
+            "weekday": courseWeekday,
+            "period_art": courseArtPeriod,
+            "period_sci": courseSciPeriod,
+        }
 
-		# Course Outline and Method
-		outlineTag = syllabusPageHeadTag.find("dl")
-		outline = fixja.remove_last_space(outlineTag.find("dd").get_text())
-		
-		# Student Attainment Objectives
-		objectivesTag = outlineTag.find_next_sibling("dl")
-		objectives = ""
-		for subString in objectivesTag.find("dd").find_next_sibling("dd").contents:
-			if str(subString) != "<br/>":
-				objectives += subString.replace("\n", "").replace("\t", "")
-			else:
-				objectives += "\n"
-		
-		# Recommended Preparatory Course
-		preCourseTag = objectivesTag.find_next_sibling("dl")
-		precourse = fixja.remove_last_space(preCourseTag.find("dd").get_text())
+        # Credit
+        creditTag = courseTimeTag.find_next_sibling("td")
+        credit = int(creditTag.get_text())
 
-		# Course Schedule
-		scheduleTableTag = preCourseTag.find_next_sibling("dl")
-		tempScheduleTableTag = scheduleTableTag.find("table").find("tr").find_next_sibling("tr")
+        # Teacher
+        courseTeacherTag = creditTag.find_next_sibling("td")
+        courseTeacherString = courseTeacherTag.get_text()
+        courseTeacherString = fixja.remove_last_space(
+            courseTeacherString.replace("\t", "").replace("\n", "").strip(" ")
+        )
 
-		scheduleList = []
+        # Confirm if there are several teachers in list
+        if "、" in courseTeacherString:
+            hasSeveralTeachers = True
+        else:
+            hasSeveralTeachers = False
 
-		while tempScheduleTableTag:
-			# Lecture
-			tempSchedule = {"lecture": int(tempScheduleTableTag.find("td").get_text()), "theme": fixja.remove_last_space(
-				fixja.convet_to_half_width(tempScheduleTableTag.find("td").find_next_sibling("td").get_text()))}
-			# Theme
-			tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
-			# Keyword, References and Supplementary Information
-			tempSchedule["references"] = fixja.remove_last_space(fixja.convet_to_half_width(tempScheduleTableTag.find("td").get_text()))
-			tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
+        if hasSeveralTeachers:
+            courseTeacher = courseTeacherString.split("、")
+        else:
+            courseTeacher = [courseTeacherString]
 
-			scheduleList.append(tempSchedule)
-		
-		# Recommendations for Private Study
-		recommendationTag = scheduleTableTag.find_next_sibling("dl")
-		recommendation = fixja.remove_last_space(recommendationTag.find("dd").get_text())
-		
-		# Grade Evaluation Method
-		gradeEvaluationTag = recommendationTag.find_next_sibling("dl")
-		gradeEveluationTableTag = gradeEvaluationTag.find("table")
+        # Course Outline and Method
+        outlineTag = syllabusPageHeadTag.find("dl")
+        outline = fixja.remove_last_space(outlineTag.find("dd").get_text())
 
-		gradeEvaluation = {
-			"note": "",
-			"data": [],
-		}
+        # Student Attainment Objectives
+        objectivesTag = outlineTag.find_next_sibling("dl")
+        objectives = ""
+        for subString in objectivesTag.find("dd").find_next_sibling("dd").contents:
+            if str(subString) != "<br/>":
+                objectives += subString.replace("\n", "").replace("\t", "")
+            else:
+                objectives += "\n"
 
-		gradeType = [
-				"End of Semester Examination (Written)",
-				"Report Examination",
-				"Other"
-		]
+        # Recommended Preparatory Course
+        preCourseTag = objectivesTag.find_next_sibling("dl")
+        precourse = fixja.remove_last_space(preCourseTag.find("dd").get_text())
 
-		gradeTypeIndex = 0
+        # Course Schedule
+        scheduleTableTag = preCourseTag.find_next_sibling("dl")
+        tempScheduleTableTag = (
+            scheduleTableTag.find("table").find("tr").find_next_sibling("tr")
+        )
 
-		for row in gradeEveluationTableTag.find_all("tr")[1:]:
-			percentage = int(row.select(".percentage")[0].get_text().replace("%", ""))
-			gradeNote = fixja.remove_last_space(row.select(".top")[0].get_text())
-			gradeEvaluation["data"].append({
-				"type": gradeType[gradeTypeIndex],
-				"percentage": percentage,
-				"note": gradeNote
-			})
-			gradeTypeIndex += 1
+        scheduleList = []
 
-		gradeEvaluationNoteTag = gradeEveluationTableTag.find_next_sibling("dl")
-		gradeEvaluationNote = gradeEvaluationNoteTag.find("dd").get_text()
-		gradeEvaluationNote = fixja.remove_last_space(gradeEvaluationNote)
-		gradeEvaluation["note"] = gradeEvaluationNote
+        while tempScheduleTableTag:
+            # Lecture
+            tempSchedule = {
+                "lecture": int(tempScheduleTableTag.find("td").get_text()),
+                "theme": fixja.remove_last_space(
+                    fixja.convet_to_half_width(
+                        tempScheduleTableTag.find("td")
+                        .find_next_sibling("td")
+                        .get_text()
+                    )
+                ),
+            }
+            # Theme
+            tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
+            # Keyword, References and Supplementary Information
+            tempSchedule["references"] = fixja.remove_last_space(
+                fixja.convet_to_half_width(tempScheduleTableTag.find("td").get_text())
+            )
+            tempScheduleTableTag = tempScheduleTableTag.find_next_sibling("tr")
 
-		# Advice to Students on Study and Research Methods
-		adviceTag = gradeEvaluationTag.find_next_sibling("dl")
-		advice = fixja.remove_last_space(adviceTag.find("dd").get_text())
+            scheduleList.append(tempSchedule)
 
-		# Textbooks
-		textBookTag = adviceTag.find_next_sibling("dl")
-		textBooks = {
-			"note": "",
-			"book": []
-		}
+        # Recommendations for Private Study
+        recommendationTag = scheduleTableTag.find_next_sibling("dl")
+        recommendation = fixja.remove_last_space(
+            recommendationTag.find("dd").get_text()
+        )
 
-		textBooksTable = textBookTag.find("table")
-		if textBooksTable:
-			for row in textBooksTable.find_all("tr")[1:]:
-				tempTextBook = {}
-				tempTag = row
-				tempTag = tempTag.find("td")
-				tempTextBook["title"] = fixja.remove_last_space(tempTag.get_text()).replace("\n", "")
-				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["author"] = fixja.remove_last_space(tempTag.get_text())
-				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
-				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["ISBN"] = fixja.remove_last_space(tempTag.get_text()).replace("ISBN","")
-				tempTag = tempTag.find_next_sibling("td")
-				tempTextBook["comment"] = fixja.remove_last_space(tempTag.get_text())
-				textBooks["book"].append(tempTextBook)
-		textBooks["note"] = fixja.remove_last_space(textBookTag.find_all("dd", class_="nest")[0].get_text())
+        # Grade Evaluation Method
+        gradeEvaluationTag = recommendationTag.find_next_sibling("dl")
+        gradeEveluationTableTag = gradeEvaluationTag.find("table")
 
-		# Reference Books
-		refBookTag = textBookTag.find_next_sibling("dl")
-		refBooks = {
-			"note": "",
-			"book": []
-		}
+        gradeEvaluation = {
+            "note": "",
+            "data": [],
+        }
 
-		refBooksTable = refBookTag.find("table")
-		if refBooksTable:
-			for row in refBooksTable.find_all("tr")[1:]:
-				tempRefBook = {}
-				tempTag = row
-				tempTag = tempTag.find("td")
-				tempRefBook["title"] = fixja.remove_last_space(tempTag.get_text()).replace("\n", "")
-				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["author"] = fixja.remove_last_space(tempTag.get_text())
-				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
-				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["ISBN"] = fixja.remove_last_space(tempTag.get_text()).replace("ISBN","")
-				tempTag = tempTag.find_next_sibling("td")
-				tempRefBook["comment"] = fixja.remove_last_space(tempTag.get_text())
-				refBooks["book"].append(tempRefBook)
-		refBooks["note"] = fixja.remove_last_space(refBookTag.find_all("dd", class_="nest")[0].get_text())
-		
-		# Web Pages for Reference
-		refPageTag = refBookTag.find_next_sibling("dl")
-		refPageStrings = refPageTag.find("dd").contents
-		refPage = ""
+        gradeType = [
+            "End of Semester Examination (Written)",
+            "Report Examination",
+            "Other",
+        ]
 
-		for refPageString in refPageStrings:
-			afterString = fixja.remove_last_space(str(refPageString))
-			if afterString != "":
-				if "<a" in afterString:
-					refPage += re.findall(r">(.+)<", afterString)[0]
-					refPage += " "
-				elif afterString == "<br/>":
-					refPage = refPage[:-1] + "\n"
-				else:
-					refPage += afterString
-					refPage += " "
+        gradeTypeIndex = 0
 
-		refPage = fixja.remove_last_space(refPage)
+        for row in gradeEveluationTableTag.find_all("tr")[1:]:
+            percentage = int(row.select(".percentage")[0].get_text().replace("%", ""))
+            gradeNote = fixja.remove_last_space(row.select(".top")[0].get_text())
+            gradeEvaluation["data"].append(
+                {
+                    "type": gradeType[gradeTypeIndex],
+                    "percentage": percentage,
+                    "note": gradeNote,
+                }
+            )
+            gradeTypeIndex += 1
 
-		# How to Communicate with the Instructor In and Out of Class(Including Instructor Contact Information)
-		contactTag = refPageTag.find_next_sibling("dl")
-		contactString = contactTag.find("dd")
-		contactMethods = []
+        gradeEvaluationNoteTag = gradeEveluationTableTag.find_next_sibling("dl")
+        gradeEvaluationNote = gradeEvaluationNoteTag.find("dd").get_text()
+        gradeEvaluationNote = fixja.remove_last_space(gradeEvaluationNote)
+        gradeEvaluation["note"] = gradeEvaluationNote
 
-		for contactMethod in re.findall(r"<b>(.*)／", str(contactString)):
-			contactMethods.append(fixja.remove_last_space(contactMethod))
+        # Advice to Students on Study and Research Methods
+        adviceTag = gradeEvaluationTag.find_next_sibling("dl")
+        advice = fixja.remove_last_space(adviceTag.find("dd").get_text())
 
-		# Other Comments
-		otherCommentsTag = contactTag.find_next_sibling("dl")
-		otherComments = fixja.remove_last_space(otherCommentsTag.find("dd").get_text())
+        # Textbooks
+        textBookTag = adviceTag.find_next_sibling("dl")
+        textBooks = {"note": "", "book": []}
 
-		# Save as dictionary
-		self.syllabusList = {
-			"basic": basicInfo,
-			"time": courseTime,
-			"teacher": courseTeacher,
-			"credit": credit,
-			"outline": outline,
-			"objectives": objectives,
-			"precourse": precourse,
-			"schedule": scheduleList,
-			"recommendation": recommendation,
-			"grade_evluation": gradeEvaluation,
-			"advice": advice,
-			"text_books": textBooks,
-			"ref_books": refBooks,
-			"ref_pages": refPage,
-			"contact_methods": contactMethods,
-			"other_comments": otherComments,
-		}
+        textBooksTable = textBookTag.find("table")
+        if textBooksTable:
+            for row in textBooksTable.find_all("tr")[1:]:
+                tempTextBook = {}
+                tempTag = row
+                tempTag = tempTag.find("td")
+                tempTextBook["title"] = fixja.remove_last_space(
+                    tempTag.get_text()
+                ).replace("\n", "")
+                tempTag = tempTag.find_next_sibling("td")
+                tempTextBook["author"] = fixja.remove_last_space(tempTag.get_text())
+                tempTag = tempTag.find_next_sibling("td")
+                tempTextBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
+                tempTag = tempTag.find_next_sibling("td")
+                tempTextBook["ISBN"] = fixja.remove_last_space(
+                    tempTag.get_text()
+                ).replace("ISBN", "")
+                tempTag = tempTag.find_next_sibling("td")
+                tempTextBook["comment"] = fixja.remove_last_space(tempTag.get_text())
+                textBooks["book"].append(tempTextBook)
+        textBooks["note"] = fixja.remove_last_space(
+            textBookTag.find_all("dd", class_="nest")[0].get_text()
+        )
 
-	def outputAsJSON(self, outputPath):
-		if len(self.syllabusList) > 0:
-			# Output data if the user has got information of all courses
-			with open(outputPath, 'w+', encoding='utf8') as outfile:
-				# Fix Kanji issue, set indent as 4
-				json.dump(self.syllabusList, outfile, ensure_ascii=False, indent=4)
-		else:
-			# Notify when output without information of courses
-			print("Use the getSyllabusById() method to get data first.")
+        # Reference Books
+        refBookTag = textBookTag.find_next_sibling("dl")
+        refBooks = {"note": "", "book": []}
+
+        refBooksTable = refBookTag.find("table")
+        if refBooksTable:
+            for row in refBooksTable.find_all("tr")[1:]:
+                tempRefBook = {}
+                tempTag = row
+                tempTag = tempTag.find("td")
+                tempRefBook["title"] = fixja.remove_last_space(
+                    tempTag.get_text()
+                ).replace("\n", "")
+                tempTag = tempTag.find_next_sibling("td")
+                tempRefBook["author"] = fixja.remove_last_space(tempTag.get_text())
+                tempTag = tempTag.find_next_sibling("td")
+                tempRefBook["publisher"] = fixja.remove_last_space(tempTag.get_text())
+                tempTag = tempTag.find_next_sibling("td")
+                tempRefBook["ISBN"] = fixja.remove_last_space(
+                    tempTag.get_text()
+                ).replace("ISBN", "")
+                tempTag = tempTag.find_next_sibling("td")
+                tempRefBook["comment"] = fixja.remove_last_space(tempTag.get_text())
+                refBooks["book"].append(tempRefBook)
+        refBooks["note"] = fixja.remove_last_space(
+            refBookTag.find_all("dd", class_="nest")[0].get_text()
+        )
+
+        # Web Pages for Reference
+        refPageTag = refBookTag.find_next_sibling("dl")
+        refPageStrings = refPageTag.find("dd").contents
+        refPage = ""
+
+        for refPageString in refPageStrings:
+            afterString = fixja.remove_last_space(str(refPageString))
+            if afterString != "":
+                if "<a" in afterString:
+                    refPage += re.findall(r">(.+)<", afterString)[0]
+                    refPage += " "
+                elif afterString == "<br/>":
+                    refPage = refPage[:-1] + "\n"
+                else:
+                    refPage += afterString
+                    refPage += " "
+
+        refPage = fixja.remove_last_space(refPage)
+
+        # How to Communicate with the Instructor In and Out of Class(Including Instructor Contact Information)
+        contactTag = refPageTag.find_next_sibling("dl")
+        contactString = contactTag.find("dd")
+        contactMethods = []
+
+        for contactMethod in re.findall(r"<b>(.*)／", str(contactString)):
+            contactMethods.append(fixja.remove_last_space(contactMethod))
+
+        # Other Comments
+        otherCommentsTag = contactTag.find_next_sibling("dl")
+        otherComments = fixja.remove_last_space(otherCommentsTag.find("dd").get_text())
+
+        # Save as dictionary
+        self.syllabusList = {
+            "basic": basicInfo,
+            "time": courseTime,
+            "teacher": courseTeacher,
+            "credit": credit,
+            "outline": outline,
+            "objectives": objectives,
+            "precourse": precourse,
+            "schedule": scheduleList,
+            "recommendation": recommendation,
+            "grade_evluation": gradeEvaluation,
+            "advice": advice,
+            "text_books": textBooks,
+            "ref_books": refBooks,
+            "ref_pages": refPage,
+            "contact_methods": contactMethods,
+            "other_comments": otherComments,
+        }
+
+    def outputAsJSON(self, outputPath: str) -> None:
+        if len(self.syllabusList) > 0:
+            # Output data if the user has got information of all courses
+            with open(outputPath, "w+", encoding="utf8") as outfile:
+                # Fix Kanji issue, set indent as 4
+                json.dump(self.syllabusList, outfile, ensure_ascii=False, indent=4)
+        else:
+            # Notify when output without information of courses
+            print("Use the getSyllabusById() method to get data first.")

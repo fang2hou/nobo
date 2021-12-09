@@ -9,24 +9,23 @@
 # @Updated : 1/29/2019
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
-import sys
 import re
-import json
+import sys
+from typing import Any, Dict, List, Optional, Tuple
 
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.wait import WebDriverWait
 
-from . import fixja
-from . import base
+from .lib import base, fixja
 
 # -------------------------------------------
 # Parser function
 # -------------------------------------------
 
 
-def parse_course_info(raw_str):
+def parse_course_info(raw_str: str) -> Tuple[str, str, str]:
     raw_str = raw_str.replace(": ", ":")
     # Use regex to get the name and code of the course
     info_str_format = r"([0-9]*):(.*)\(([A-Z]|[A-Z][0-9]|[0-9][A-Z])\)"
@@ -34,35 +33,43 @@ def parse_course_info(raw_str):
     return code, name, class_order
 
 
-def parse_course_time(raw_str):
+def parse_course_time(raw_str: str) -> Tuple[str, str, str, str]:
     try:
         # Science
         time_str_format = r"([月|火|水|木|金])([0-9]{1,2})\(([0-9]{1,2})-([0-9]{1,2})\)"
         weekday, period, sci_period_start, sci_period_end = re.findall(
-            time_str_format, raw_str)[0]
-    except:
+            time_str_format, raw_str
+        )[0]
+    except Exception:
         # Arts
         try:
             time_str_format = r"([月|火|水|木|金])([0-9]{1,2})"
             weekday, period = re.findall(time_str_format, raw_str)[0]
             sci_period_start, sci_period_end = "unknown", "unknown"
-        except:
-            weekday, period, sci_period_start, sci_period_end = "unknown", "unknown", "unknown", "unknown"
+        except Exception:
+            weekday, period, sci_period_start, sci_period_end = (
+                "unknown",
+                "unknown",
+                "unknown",
+                "unknown",
+            )
 
     weekday = fixja.translate_weekday(weekday)
     return weekday, period, sci_period_start, sci_period_end
 
 
-def parse_course_room_with_campus(raw_str):
+def parse_course_room_with_campus(raw_str: str) -> Tuple[str, str]:
     # NOTICE: This function is unused since campus info has been deleted
     try:
         time_str_format = r"([衣笠|KIC|BKC|OIC]) ([.*])"
         campus, room = re.findall(time_str_format, raw_str)[0]
         # Fix if "KIC" written in Kanji.
         campus = campus.replace("衣笠", "KIC")
-    except:
+    except TypeError:
         # Other course
         campus, room = "unknown", "unknown"
+    except Exception as e:
+        raise e
 
     return campus, room
 
@@ -71,7 +78,13 @@ class RitsStudent(object):
     # -------------------------------------------
     # RitsStudent Class
     # -------------------------------------------
-    def __init__(self, username, password, config_path=None, webdriver_path=None):
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        config_path: Optional[str] = None,
+        webdriver_path: Optional[str] = None,
+    ):
         # Initialize user data
         self.username = username
         self.password = password
@@ -89,15 +102,19 @@ class RitsStudent(object):
         chrome_options.add_argument("--log-level=3")
         chrome_options.add_argument("--blink-settings=imagesEnabled=false")
 
-        if None == webdriver_path:
-            webdriver_path = sys.path[0]+"/chromedriver"
+        if webdriver_path is None:
+            webdriver_path = sys.path[0] + "/chromedriver"
 
         self.webdriver = webdriver.Chrome(
-            chrome_options=chrome_options, executable_path=webdriver_path)
+            chrome_options=chrome_options, executable_path=webdriver_path
+        )
         self.wait_time_out = WebDriverWait(
-            self.webdriver, self.config["manaba"]["timeout"], self.config["manaba"]["login_attempt_interval"])
+            self.webdriver,
+            self.config["manaba"]["timeout"],
+            self.config["manaba"]["login_attempt_interval"],
+        )
 
-    def login(self):
+    def login(self) -> bool:
         # Try to get the homepage of manaba
         self.webdriver.get(self.config["manaba"]["homepage"])
 
@@ -113,19 +130,18 @@ class RitsStudent(object):
         # Wait for login button rendering
         try:
             self.wait_time_out.until(
-                lambda sign: self.webdriver.find_element_by_id("web_single_sign-on"))
-        except:
+                lambda sign: self.webdriver.find_element_by_id("web_single_sign-on")
+            )
+        except Exception:
             base.debug_print("[nobo][{}] Login timeout.".format(self.username))
-            return
+            return False
 
         # Enter username
-        inputElement = self.webdriver.find_element_by_xpath(
-            "//input[@name='USER']")
+        inputElement = self.webdriver.find_element_by_xpath("//input[@name='USER']")
         inputElement.send_keys(self.username)
 
         # Enter password
-        inputElement = self.webdriver.find_element_by_xpath(
-            "//input[@name='PASSWORD']")
+        inputElement = self.webdriver.find_element_by_xpath("//input[@name='PASSWORD']")
         inputElement.send_keys(self.password)
 
         # Submit the form
@@ -133,39 +149,46 @@ class RitsStudent(object):
 
         # Send a message if username or password is not correct
         if "AuthError" in self.webdriver.current_url:
-            base.debug_print("[nobo][{}]  Invalid ID or PASSWORD. ".format(self.username))
+            base.debug_print(
+                "[nobo][{}]  Invalid ID or PASSWORD. ".format(self.username)
+            )
             return False
 
         return True
 
-    def get_course_list(self):
+    def get_course_list(self) -> Optional[List[Dict[str, Any]]]:
         if not self.login():
-            base.debug_print("[nobo][{}] Error: Login process is failed.".format(self.username))
-            return
+            base.debug_print(
+                "[nobo][{}] Error: Login process is failed.".format(self.username)
+            )
+            return None
 
-        base.debug_print("[nobo][{}] Login successful, start to get courses.".format(self.username))
+        base.debug_print(
+            "[nobo][{}] Login successful, start to get courses.".format(self.username)
+        )
         self.webdriver.get(
-            self.config["manaba"]["homepage"]+"_course?chglistformat=list")
+            self.config["manaba"]["homepage"] + "_course?chglistformat=list"
+        )
         course_page = self.webdriver.page_source
-        course_table_body = bs(
-            course_page, "html.parser").select(".courselist")[0]
+        course_table_body = bs(course_page, "html.parser").select(".courselist")[0]
 
         # Initialize the output list
         course_list = []
 
         # Try to get each course information
         # The first -> 0, last 2 -> -2 is not a course (department notice, research etc.)
-        base.debug_print("[nobo][{}] Start to parse table of courses.".format(self.username))
+        base.debug_print(
+            "[nobo][{}] Start to parse table of courses.".format(self.username)
+        )
         for course_table_line in course_table_body.select(".courselist-c"):
 
             # Initialize the course
-            temp_course = {}
+            temp_course: Dict[str, Any] = {}
 
             # Academic year
             # -------------------------------------------
             # If the acdemic year is missed, it shows this line is not a course, maybe a page
-            academic_year_tag = course_table_line.find(
-                "td").find_next_sibling("td")
+            academic_year_tag = course_table_line.find("td").find_next_sibling("td")
             if "" == academic_year_tag.get_text():
                 continue
             else:
@@ -175,10 +198,8 @@ class RitsStudent(object):
             # -------------------------------------------
             course_name_tag = course_table_line.find("td")
             # Convert the name into correct encode
-            course_name_text = course_name_tag.select(
-                ".courselist-title")[0].get_text()
-            course_name_text = fixja.convet_to_half_width(
-                course_name_text).strip()
+            course_name_text = course_name_tag.select(".courselist-title")[0].get_text()
+            course_name_text = fixja.convet_to_half_width(course_name_text).strip()
 
             # If the course has two names and codes, set the flag to process automatically
             if "§" in course_name_text:
@@ -187,26 +208,34 @@ class RitsStudent(object):
                 course_codes = {}
                 course_classes = {}
                 course_codes[0], course_names[0], course_classes[0] = parse_course_info(
-                    course_names[0])
+                    course_names[0]
+                )
                 course_codes[1], course_names[1], course_classes[1] = parse_course_info(
-                    course_names[1])
-                temp_course["basic"] = [{
-                    "code": int(course_codes[0]),
-                    "name": course_names[0],
-                    "class": course_classes[0]
-                }, {
-                    "code": int(course_codes[1]),
-                    "name": course_names[1],
-                    "class": course_classes[1]
-                }]
+                    course_names[1]
+                )
+                temp_course["basic"] = [
+                    {
+                        "code": int(course_codes[0]),
+                        "name": course_names[0],
+                        "class": course_classes[0],
+                    },
+                    {
+                        "code": int(course_codes[1]),
+                        "name": course_names[1],
+                        "class": course_classes[1],
+                    },
+                ]
             else:
                 course_code, course_name, course_class = parse_course_info(
-                    course_name_text)
-                temp_course["basic"] = [{
-                    "code": int(course_code),
-                    "name": course_name,
-                    "class": course_class
-                }]
+                    course_name_text
+                )
+                temp_course["basic"] = [
+                    {
+                        "code": int(course_code),
+                        "name": course_name,
+                        "class": course_class,
+                    }
+                ]
 
             # Course time
             # -------------------------------------------
@@ -221,8 +250,12 @@ class RitsStudent(object):
             else:
                 course_semester = "unknown"
 
-            course_weekday, course_period, course_sci_period_start, course_sci_period_end = parse_course_time(
-                course_time_text)
+            (
+                course_weekday,
+                course_period,
+                course_sci_period_start,
+                course_sci_period_end,
+            ) = parse_course_time(course_time_text)
 
             temp_course["time"] = {
                 "year": academic_year,
@@ -240,9 +273,12 @@ class RitsStudent(object):
                 course_time_room_tag.span.extract()
                 course_time_room_tag.br.extract()
                 course_room = course_time_room_tag.get_text().strip()
-            except:
+            except Exception:
                 base.debug_print(
-                    "[nobo][{}] Something wrong with deleting useless tags.".format(self.username))
+                    "[nobo][{}] Something wrong with deleting useless tags.".format(
+                        self.username
+                    )
+                )
                 course_room = "unknown"
             temp_course["room"] = course_room
 

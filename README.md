@@ -5,7 +5,6 @@ Note: *This is a personal open source project. Please use `nobo` at your own ris
 **nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.
 You can use **nobo** to build your own data API with many frameworks(`Flask`, `Django` etc.).
 
-
 ## Requirements
 
 - [Chrome](https://www.google.com/chrome/)

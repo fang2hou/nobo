@@ -9,15 +9,15 @@
 # @Updated : 1/28/2019
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
-import os
-import sys
-import json
 import hashlib
+import json
+import os
+from typing import Any, Dict, Optional
 
 DEBUG = True
 
 
-def load_config(path=None):
+def load_config(path: Optional[str] = None) -> Dict[str, Any]:
     """
     Load configuration from file.
 
@@ -25,16 +25,14 @@ def load_config(path=None):
     If the path is empty, Nobo will load default configuration.
 
     Args:
-            path: the location that configuration file is. 
+            path: the location that configuration file is.
 
     Returns:
-            A dict mapping keys to the corresponding table row data fetched. 
+            A dict mapping keys to the corresponding table row data fetched.
     """
 
     default_config = {
-        "basic":{
-            "local_cache_dir": "localdb"
-        },
+        "basic": {"local_cache_dir": "localdb"},
         "manaba": {
             "homepage": "https://ct.ritsumei.ac.jp/ct/home",
             "domain_root": "ct.ritsumei.ac.jp",
@@ -43,33 +41,33 @@ def load_config(path=None):
             "timeout": 10,
             "cookies_cache": True,
             "encryption": "md5",
-            "save_mode": "file"
-        }
+            "save_mode": "file",
+        },
     }
 
-    if None != path:
-        with open(path, 'r') as configuration:
+    if path is not None:
+        with open(path, "r") as configuration:
             return json.loads(configuration.read())
 
     return default_config
 
 
-def LoadCookiesFromFile(cacheDirectory, fileId):
+def LoadCookiesFromFile(cacheDirectory: str, fileId: str) -> Optional[Dict[str, Any]]:
     if not os.path.isdir(cacheDirectory + "/cookies/"):
         os.makedirs(cacheDirectory + "/cookies/")
 
     try:
-        with open(cacheDirectory + "/cookies/" + fileId, 'r+') as f:
+        with open(cacheDirectory + "/cookies/" + fileId, "r+") as f:
             return json.loads(f.read())
     except FileNotFoundError:
         return None
 
 
-def convert_to_md5(str):
-    hashlib.md5().update(str.encode("utf8"))
+def convert_to_md5(s: str) -> str:
+    hashlib.md5().update(s.encode("utf8"))
     return hashlib.md5().hexdigest()
 
 
-def debug_print(str):
+def debug_print(s: object) -> None:
     if DEBUG:
-        print(str)
+        print(s)

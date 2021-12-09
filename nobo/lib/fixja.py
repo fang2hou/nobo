@@ -10,6 +10,7 @@
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 
+
 def convet_to_half_width(inputString: str) -> str:
     fixDict = {
         "　": " ",
@@ -32,12 +33,12 @@ def convet_to_half_width(inputString: str) -> str:
     return finalString
 
 
-def remove_newline(inputString):
+def remove_newline(inputString: str) -> str:
     finalString = inputString.replace("\n", "")
     return finalString
 
 
-def translate_weekday(string):
+def translate_weekday(s: str) -> str:
     convert_dict = {
         "月": "Monday",
         "火": "Tuesday",
@@ -57,23 +58,18 @@ def translate_weekday(string):
     }
 
     for jp, en in convert_dict.items():
-        string = string.replace(jp, en)
+        s = s.replace(jp, en)
 
-    return string
+    return s
 
 
-def remove_last_space(string):
-    remove_list = [
-        "\xa0",  # Full-width Space used in Japanese
-        "\n",
-        "\t",
-        " "
-    ]
+def remove_last_space(s: str) -> str:
+    remove_list = ["\xa0", "\n", "\t", " "]  # Full-width Space used in Japanese
 
-    if string in remove_list:
-        string = ""
+    if s in remove_list:
+        s = ""
     else:
-        while string[-1:] in remove_list:
-            string = string[:-1]
+        while s[-1:] in remove_list:
+            s = s[:-1]
 
-    return string
+    return s

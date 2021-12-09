@@ -1,5 +1,2 @@
-from .manaba import RitsStudent
-
-__all__ = [
-    'io',
-]
+# from .manaba import manaba
+__version__ = "0.1"

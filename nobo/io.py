@@ -10,9 +10,10 @@
 # @Homepage: https://github.com/fang2hou/nobo
 # -------------------------------------------
 import json
+from typing import Any, Dict
 
 
-def export_as_json(path, content):
+def export_as_json(path: str, content: Dict[str, Any]) -> bool:
     """
     Export data as JSON format.
 
@@ -25,7 +26,7 @@ def export_as_json(path, content):
     """
     file_accessed = False
 
-    with open(path, 'w+', encoding='utf8') as outfile:
+    with open(path, "w+", encoding="utf8") as outfile:
         file_accessed = True
         json.dump(content, outfile, ensure_ascii=False, indent=4)
 
