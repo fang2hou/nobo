@@ -17,7 +17,8 @@ Note: *Latest version of Chrome and ChromeDriver* is recommended.
 ### From source
 
 ```bash
-git clone --depth 1 https://github.com/eggplants/nobo && cd nobo
+git clone --depth 1 https://github.com/eggplants/nobo
+cd nobo
 pip install -e .
 ```
 
