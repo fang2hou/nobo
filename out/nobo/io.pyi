@@ -1,0 +1,3 @@
+from typing import Any, Dict
+
+def export_as_json(path: str, content: Dict[str, Any]) -> bool: ...

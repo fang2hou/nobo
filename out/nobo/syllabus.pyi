@@ -1,0 +1,13 @@
+from .lib import fixja as fixja
+from typing import Any
+
+class syllabusUser:
+    syllabusHomePagePath: str
+    rainbowID: Any
+    rainbowPassword: Any
+    webSession: Any
+    syllabusList: Any
+    def __init__(self, username: str, password: str) -> None: ...
+    def login(self) -> None: ...
+    def getSyllabusById(self, courseYear: str, courseID: str) -> None: ...
+    def outputAsJSON(self, outputPath: str) -> None: ...
