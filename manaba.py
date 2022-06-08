@@ -287,7 +287,7 @@ class RitsStudent(object):
             emergency_announcements.append(element_dict)
 
         base.debug_print(
-            "[nobo][{}] Emergency announcement got.".format(self.username))
+            "[nobo][{}] Emergency announcements got.".format(self.username))
 
         return emergency_announcements
 
