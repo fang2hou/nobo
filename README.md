@@ -1,4 +1,5 @@
 # nobo, No Borders
+
 ![](https://img.shields.io/badge/Ritsumeikan%20University-API-blue.svg?colorA=990000&colorB=444444&longCache=true&style=flat) ![](https://img.shields.io/badge/Python-3.7.1-green.svg?longCache=true&style=flat) ![](https://img.shields.io/badge/Chrome-WebDriver-blue.svg?logo=Google%20Chrome&style=flat)
 
 **This is a personal open source project. Please use `nobo` at your own risk.**
@@ -6,31 +7,37 @@
 **nobo** is a spider that you could get your data from each service provides by Ritsumeikan Univ.  
 You can use **nobo** to build your own data API with many frameworks(`Flask`, `Django` etc.).
 
-# NOTICE:
+# NOTICE
+
 Ritsumeikan University deployed f5 obfuscator several months ago. :(  
 Although, I don't know the situation in other schools. The truth is legacy version cannot work perfectly nowadays.  
 But if you wanna build your own spider with legacy version, please check the `legacy` branch.
 
 The mainly difference between `legacy` version and `master` version:  
+
 1. `legacy` use `requests` to send requests, but `master` use webdriver for Chrome.
 2. `legacy` is faster, but it cannot handle the page with code confusion.
 
-## Fix list:
+## Fix list
+
 - [x] [manaba] course list @ 7/28/2018
 - [x] [manaba] better performance @ 1/28/2019
 - [ ] [syllabus] ritsumei syllabus -> manaba syllabus
 - [ ] [syllabus] get syllabus by id
 
-## New feature:
+## New feature
+
+- [ ] [manaba] announcement list
 - [ ] [syllabus] search syllabus by string
 - [ ] [compusweb] scholarship information
 - [ ] [compusweb] final test information
 - [ ] [compusweb] grade information
 
 # License
-__GPLv3__
+**GPLv3**
 
 # How to import?
+
 1. Install Python 3.  
 Recommended Python Version: 3.7.1+
 2. Install `nobo` with `pip` / `pip3`
@@ -38,6 +45,7 @@ Recommended Python Version: 3.7.1+
     ```bash
     pip3 install nobo
     ```
+
 3. Install latest version of Chrome and ChromeDriver
    - [Chrome](https://www.google.com/chrome/), latest version is recommended
    - [ChromeDriver](http://chromedriver.chromium.org/downloads), unzip and move `chromedriver`/`chromedriver.exe` into your project directory.
@@ -50,9 +58,11 @@ Recommended Python Version: 3.7.1+
     ```
 
 # Manaba Spider
+
 It seems that Manaba of each school are different, you can change a little bit code inside [manaba.py](manaba.py) to let nobo be compatible with your manaba page.
 
 ## How to use
+
 1. Create a `RitsStudent` instance.
 
     ```python
@@ -72,6 +82,7 @@ Use `try...except...finally...` to handle exceptions is highly recommanded.
     ```
 
 ## Course list example
+
 The example course will show as following.
 
 ```json
