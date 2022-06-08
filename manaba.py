@@ -268,25 +268,14 @@ class RitsStudent(object):
             course_list.append(temp_course)
 
         base.debug_print("[nobo][{}] Course list got.".format(self.username))
-        self.webdriver.close()
+
         return course_list
 
-    def get_emergency_announcements(self):
-        if not self.login():
-            base.debug_print(
-                "[nobo][{}] Error: Login process is failed.".format(self.username))
-            return
-
-        base.debug_print(
-            "[nobo][{}] Login successful, start to get emergency announcement.".format(self.username))
-        self.webdriver.get(
-            self.config["manaba"]["homepage"]+"_announcement")
-
+    def get_emergency_announcements(self, page_source):
         emergency_announcements = []
 
-        announcement_page = self.webdriver.page_source
         emergency_announcement_table_rows = bs(
-            announcement_page, "html.parser").select(
+            page_source, "html.parser").select(
             "#kinkyudata > div.my-infolist-body > table > tbody > tr")
 
         for row in emergency_announcement_table_rows:
@@ -294,32 +283,19 @@ class RitsStudent(object):
             element_dict["date"] = row.select("td")[0].get_text().strip()
             element_dict["title"] = row.select(
                 "td")[1].select("div > a")[0].get_text()
+            element_dict["from"] = ""
             emergency_announcements.append(element_dict)
 
         base.debug_print(
             "[nobo][{}] Emergency announcement got.".format(self.username))
-        base.debug_print(emergency_announcements)
 
-        self.webdriver.close()
         return emergency_announcements
 
-    def get_announcements_to_individual(self):
-        if not self.login():
-            base.debug_print(
-                "[nobo][{}] Error: Login process is failed.".format(self.username))
-            return
-
-        base.debug_print(
-            "[nobo][{}] Login successful, start to get announcements to individual.".format(self.username))
-
-        self.webdriver.get(
-            self.config["manaba"]["homepage"]+"_announcement")
-
+    def get_announcements_to_individual(self, page_source):
         announcements_to_individual = []
 
-        announcement_page = self.webdriver.page_source
         announcements_to_individual_table_rows = list(bs(
-            announcement_page, "html.parser").select("#announcementlistdiv > table > tbody > tr"))
+            page_source, "html.parser").select("#announcementlistdiv > table > tbody > tr"))
 
         for i in range(len(announcements_to_individual_table_rows)-1):
             row = announcements_to_individual_table_rows[i]
@@ -333,28 +309,14 @@ class RitsStudent(object):
 
         base.debug_print(
             "[nobo][{}] Announcements to individual got.".format(self.username))
-        base.debug_print(announcements_to_individual)
 
-        self.webdriver.close()
         return announcements_to_individual
 
-    def get_other_announcements(self):
-        if not self.login():
-            base.debug_print(
-                "[nobo][{}] Error: Login process is failed.".format(self.username))
-            return
-
-        base.debug_print(
-            "[nobo][{}] Login successful, start to get other announcements.".format(self.username))
-
-        self.webdriver.get(
-            self.config["manaba"]["homepage"]+"_announcement")
-
+    def get_other_announcements(self, page_source):
         other_announcements = []
 
-        announcement_page = self.webdriver.page_source
         other_announcements_table_rows = list(bs(
-            announcement_page, "html.parser").select("#pubannouncementlistdiv > table > tbody > tr"))
+            page_source, "html.parser").select("#pubannouncementlistdiv > table > tbody > tr"))
 
         for row in other_announcements_table_rows:
             element_dict = {}
@@ -367,7 +329,25 @@ class RitsStudent(object):
 
         base.debug_print(
             "[nobo][{}] Other announcements got.".format(self.username))
-        base.debug_print(other_announcements)
+
+        return other_announcements
+
+    def get_all_announcements(self):
+        if not self.login():
+            base.debug_print(
+                "[nobo][{}] Error: Login process is failed.".format(self.username))
+            return
+
+        base.debug_print(
+            "[nobo][{}] Login successful, start to get all announcements.".format(self.username))
+
+        self.webdriver.get(
+            self.config["manaba"]["homepage"]+"_announcement")
+
+        page_source = self.webdriver.page_source
 
         self.webdriver.close()
-        return other_announcements
+
+        return {"emergency": self.get_emergency_announcements(page_source),
+                "individual": self.get_announcements_to_individual(page_source),
+                "other": self.get_other_announcements(page_source)}
