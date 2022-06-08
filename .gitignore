@@ -18,3 +18,5 @@ debug*
 # Ignore webdriver
 *chromedriver*
 *phantomjs*
+
+pyproject.toml
