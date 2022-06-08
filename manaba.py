@@ -285,12 +285,9 @@ class RitsStudent(object):
         emergency_announcements = []
 
         announcement_page = self.webdriver.page_source
-        emergency_announcement_table_div_parent = bs(
-            announcement_page, "html.parser").select("#kinkyudata")[0]
-        emergency_announcement_table_div = emergency_announcement_table_div_parent.select("div")[
-            1]
-        emergency_announcement_table_rows = emergency_announcement_table_div.select(
-            "tr")
+        emergency_announcement_table_rows = bs(
+            announcement_page, "html.parser").select(
+            "#kinkyudata > div.my-infolist-body > table > tbody > tr")
 
         for row in emergency_announcement_table_rows:
             element_dict = {}
