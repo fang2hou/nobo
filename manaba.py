@@ -337,3 +337,37 @@ class RitsStudent(object):
 
         self.webdriver.close()
         return announcements_to_individual
+
+    def get_other_announcements(self):
+        if not self.login():
+            base.debug_print(
+                "[nobo][{}] Error: Login process is failed.".format(self.username))
+            return
+
+        base.debug_print(
+            "[nobo][{}] Login successful, start to get other announcements.".format(self.username))
+
+        self.webdriver.get(
+            self.config["manaba"]["homepage"]+"_announcement")
+
+        other_announcements = []
+
+        announcement_page = self.webdriver.page_source
+        other_announcements_table_rows = list(bs(
+            announcement_page, "html.parser").select("#pubannouncementlistdiv > table > tbody > tr"))
+
+        for row in other_announcements_table_rows:
+            element_dict = {}
+            element_dict["date"] = row.select("td")[0].get_text().strip()
+            element_dict["title"] = fixja.convet_to_half_width(row.select(
+                "td")[1].select("div > a")[0].get_text()).strip()
+            element_dict["from"] = row.select(
+                "td")[2].get_text().strip()
+            other_announcements.append(element_dict)
+
+        base.debug_print(
+            "[nobo][{}] Other announcements got.".format(self.username))
+        base.debug_print(other_announcements)
+
+        self.webdriver.close()
+        return other_announcements
