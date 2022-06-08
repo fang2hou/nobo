@@ -292,8 +292,8 @@ class RitsStudent(object):
         for row in emergency_announcement_table_rows:
             element_dict = {}
             element_dict["date"] = row.select("td")[0].get_text().strip()
-            element_dict["title"] = row.select("td")[1].select("div")[
-                0].select("a")[0].get_text()
+            element_dict["title"] = row.select(
+                "td")[1].select("div > a")[0].get_text()
             emergency_announcements.append(element_dict)
 
         base.debug_print(
@@ -302,3 +302,38 @@ class RitsStudent(object):
 
         self.webdriver.close()
         return emergency_announcements
+
+    def get_announcements_to_individual(self):
+        if not self.login():
+            base.debug_print(
+                "[nobo][{}] Error: Login process is failed.".format(self.username))
+            return
+
+        base.debug_print(
+            "[nobo][{}] Login successful, start to get announcements to individual.".format(self.username))
+
+        self.webdriver.get(
+            self.config["manaba"]["homepage"]+"_announcement")
+
+        announcements_to_individual = []
+
+        announcement_page = self.webdriver.page_source
+        announcements_to_individual_table_rows = list(bs(
+            announcement_page, "html.parser").select("#announcementlistdiv > table > tbody > tr"))
+
+        for i in range(len(announcements_to_individual_table_rows)-1):
+            row = announcements_to_individual_table_rows[i]
+            element_dict = {}
+            element_dict["date"] = row.select("td")[0].get_text().strip()
+            element_dict["title"] = row.select(
+                "td")[1].select("div > a")[0].get_text()
+            element_dict["from"] = row.select(
+                "td")[2].get_text().strip()
+            announcements_to_individual.append(element_dict)
+
+        base.debug_print(
+            "[nobo][{}] Announcements to individual got.".format(self.username))
+        base.debug_print(announcements_to_individual)
+
+        self.webdriver.close()
+        return announcements_to_individual
